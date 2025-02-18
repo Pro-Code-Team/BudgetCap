@@ -1,0 +1,38 @@
+# Flutter/Dart specific
+**/android/.gradle/
+**/android/app/key.jks
+**/android/key.properties
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/.generated/
+**/lib/generated_plugin_registrant.dart
+
+# Build files
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/.pub-cache/
+**/.pub/
+**/.idea/
+
+# VS Code
+**/.vscode/
+
+# Xcode
+**/ios/Runner.xcworkspace/
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/ios/.dart_tool/
+
+# Android
+**/android/.cxx/
+**/android/local.properties
+
+# Miscellaneous
+**/*.iml
+**/*.log
+pubspec.lock
+.env
