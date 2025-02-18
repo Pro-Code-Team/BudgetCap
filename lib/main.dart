@@ -1,6 +1,16 @@
+import 'package:budgetcap/config/constants/variables.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+Future main() async {
+  //Initial widgets will load.
+  //WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  //Setting up the supabase
+  await Supabase.initialize(
+      url: 'https://rdslpdguvbjyxouecbsw.supabase.co',
+      anonKey: Variables.supabaseAnonKey);
   runApp(const MyApp());
 }
 
