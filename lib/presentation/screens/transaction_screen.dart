@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 enum Operations { transfer, income, expense }
 
 class TransactionScreen extends StatelessWidget {
-  TransactionScreen({super.key});
+  TransactionScreen({super.key, required this.selectedDate});
 
+  final DateTime selectedDate;
   final Operations view = Operations.income;
   final List<String> accounts = ['Ficohsa', 'BAC', 'Banpro', 'LAFISE'];
   final List<String> categories = [
@@ -29,7 +31,7 @@ class TransactionScreen extends StatelessWidget {
             children: [
               Center(
                 child: SegmentedButton<Operations>(
-                  segments: <ButtonSegment<Operations>>[
+                  segments: const <ButtonSegment<Operations>>[
                     ButtonSegment(
                       value: Operations.income,
                       label: Text("Income"),
@@ -52,7 +54,8 @@ class TransactionScreen extends StatelessWidget {
               ),
               Center(
                 child: Chip(
-                  label: Text("Test"),
+                  avatar: const Icon(Icons.calendar_month),
+                  label: Text((DateFormat.yMMMd().format(DateTime.now()))),
                 ),
               ),
               const SizedBox(
@@ -105,20 +108,6 @@ class TransactionScreen extends StatelessWidget {
 
               const SizedBox(
                 height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(
-                      child: Row(
-                    children: [
-                      Icon(Icons.calendar_today),
-                      SizedBox(
-                        width: 10,
-                      ),
-                    ],
-                  )),
-                ],
               ),
               const SizedBox(
                 height: 10,
