@@ -1,4 +1,5 @@
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
+import 'package:budgetcap/presentation/blocs/category/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
 import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,6 +34,7 @@ class TransactionScreen extends StatelessWidget {
         BlocProvider<AccountBloc>(
           create: (_) => AccountBloc(),
         ),
+        BlocProvider<CategoryBloc>(create: (_) => CategoryBloc())
       ],
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
@@ -177,6 +179,25 @@ class TransactionScreen extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
+                BlocBuilder<CategoryBloc, CategoryState>(
+                    builder: (context, state) {
+                  return Container(
+                    height: 9000,
+                    child: GridView.count(
+                      crossAxisCount: 4,
+                      children: state.categories.map(
+                        (category) {
+                          return Column(
+                            children: [
+                              Icon(Icons.abc),
+                              Text(category.name),
+                            ],
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  );
+                })
               ],
             ),
           ),
