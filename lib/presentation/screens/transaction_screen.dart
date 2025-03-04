@@ -1,4 +1,5 @@
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
+import 'package:budgetcap/presentation/blocs/record_type/record_type_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -20,8 +21,15 @@ class TransactionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => DatePickerBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<RecordTypeBloc>(
+          create: (context) => RecordTypeBloc(),
+        ),
+        BlocProvider<DatePickerBloc>(
+          create: (context) => DatePickerBloc(),
+        ),
+      ],
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Add Record"),
@@ -33,23 +41,32 @@ class TransactionScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Center(
-                  child: SegmentedButton<Operations>(
-                    segments: const <ButtonSegment<Operations>>[
-                      ButtonSegment(
-                        value: Operations.income,
-                        label: Text("Income"),
-                      ),
-                      ButtonSegment(
-                        value: Operations.expense,
-                        label: Text("Expense"),
-                      ),
-                      ButtonSegment(
-                        value: Operations.transfer,
-                        label: Text("Transfer"),
-                      )
-                    ],
-                    selected: {view},
-                    onSelectionChanged: (p0) => {},
+                  child: BlocBuilder<RecordTypeBloc, RecordTypeState>(
+                    builder: (context, state) {
+                      return SegmentedButton<Operations>(
+                        segments: const <ButtonSegment<Operations>>[
+                          ButtonSegment(
+                            value: Operations.income,
+                            label: Text("Income"),
+                          ),
+                          ButtonSegment(
+                            value: Operations.expense,
+                            label: Text("Expense"),
+                          ),
+                          ButtonSegment(
+                            value: Operations.transfer,
+                            label: Text("Transfer"),
+                          )
+                        ],
+                        selected: <Operations>{
+                          state.selectedValue as Operations
+                        },
+                        onSelectionChanged: (selected) {
+                          context.read<RecordTypeBloc>().add(
+                              RecordChanged(selectedRecord: selected.first));
+                        },
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(
