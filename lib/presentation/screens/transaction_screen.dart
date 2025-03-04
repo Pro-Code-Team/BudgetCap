@@ -1,5 +1,6 @@
+import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
-import 'package:budgetcap/presentation/blocs/record_type/record_type_bloc.dart';
+import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -24,13 +25,20 @@ class TransactionScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<RecordTypeBloc>(
-          create: (context) => RecordTypeBloc(),
+          create: (_) => RecordTypeBloc(),
         ),
         BlocProvider<DatePickerBloc>(
-          create: (context) => DatePickerBloc(),
+          create: (_) => DatePickerBloc(),
+        ),
+        BlocProvider<AccountBloc>(
+          create: (_) => AccountBloc(),
         ),
       ],
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: Icon(Icons.check),
+        ),
         appBar: AppBar(
           title: const Text("Add Record"),
         ),
@@ -64,6 +72,7 @@ class TransactionScreen extends StatelessWidget {
                         onSelectionChanged: (selected) {
                           context.read<RecordTypeBloc>().add(
                               RecordChanged(selectedRecord: selected.first));
+                          print(selected);
                         },
                       );
                     },
@@ -121,28 +130,12 @@ class TransactionScreen extends StatelessWidget {
                 ),
 
                 ///General Section
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const SizedBox(
-                        child: Row(
-                      children: [
-                        Icon(Icons.wallet),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text('Account'),
-                      ],
-                    )),
-                    DropdownMenu<String>(
-                        initialSelection: accounts.first,
-                        dropdownMenuEntries: accounts
-                            .map(
-                              (String option) => DropdownMenuEntry(
-                                  value: option, label: option),
-                            )
-                            .toList()),
-                  ],
+
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    hintText: 'Enter a description',
+                  ),
                 ),
                 const SizedBox(
                   height: 10,
@@ -167,14 +160,18 @@ class TransactionScreen extends StatelessWidget {
                         Text('Account'),
                       ],
                     )),
-                    DropdownMenu<String>(
-                        initialSelection: accounts.first,
-                        dropdownMenuEntries: accounts
-                            .map(
-                              (String option) => DropdownMenuEntry(
-                                  value: option, label: option),
-                            )
-                            .toList()),
+                    BlocBuilder<AccountBloc, AccountState>(
+                      builder: (context, state) {
+                        return DropdownMenu<String>(
+                            initialSelection: state.selectedAccount,
+                            dropdownMenuEntries: state.accounts
+                                .map(
+                                  (String option) => DropdownMenuEntry(
+                                      value: option, label: option),
+                                )
+                                .toList());
+                      },
+                    ),
                   ],
                 ),
                 const SizedBox(
