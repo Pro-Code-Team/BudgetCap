@@ -2,6 +2,7 @@ import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/category/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
 import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
+import 'package:budgetcap/presentation/widgets/iconGrabber.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -39,7 +40,7 @@ class TransactionScreen extends StatelessWidget {
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
-          child: Icon(Icons.check),
+          child: const Icon(Icons.check),
         ),
         appBar: AppBar(
           title: const Text("Add Record"),
@@ -133,7 +134,7 @@ class TransactionScreen extends StatelessWidget {
 
                 ///General Section
 
-                TextField(
+                const TextField(
                   decoration: InputDecoration(
                     labelText: 'Description',
                     hintText: 'Enter a description',
@@ -177,27 +178,51 @@ class TransactionScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 30,
                 ),
                 BlocBuilder<CategoryBloc, CategoryState>(
-                    builder: (context, state) {
-                  return Container(
-                    height: 9000,
-                    child: GridView.count(
-                      crossAxisCount: 4,
-                      children: state.categories.map(
-                        (category) {
-                          return Column(
-                            children: [
-                              Icon(Icons.abc),
-                              Text(category.name),
-                            ],
-                          );
-                        },
-                      ).toList(),
-                    ),
-                  );
-                })
+                  builder: (context, state) {
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3, // Number of columns
+                        crossAxisSpacing:
+                            20.0, // Horizontal spacing between items
+                        mainAxisSpacing: 20.0, // Vertical spacing between items
+                      ),
+                      itemCount: state.categories.length,
+                      itemBuilder: (context, index) {
+                        final category = state.categories[index];
+                        final iconName = category.icon;
+                        return InkWell(
+                          onTap: () {},
+                          borderRadius: BorderRadius.circular(20),
+                          splashColor: const Color.fromARGB(255, 156, 143, 193),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.grey,
+                                width: 0.5,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconGrabber(iconName: iconName),
+                                Text(category.name),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                )
               ],
             ),
           ),
