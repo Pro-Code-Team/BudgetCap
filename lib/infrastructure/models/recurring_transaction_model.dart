@@ -1,4 +1,4 @@
-class RecurringTransaction {
+class RecurringTransactionModel {
   final String id;
   final String userId;
   final String accountId;
@@ -9,7 +9,7 @@ class RecurringTransaction {
   final DateTime? endDate;
   final String status;
 
-  RecurringTransaction({
+  RecurringTransactionModel({
     required this.id,
     required this.userId,
     required this.accountId,
@@ -21,7 +21,7 @@ class RecurringTransaction {
     required this.status,
   });
 
-  RecurringTransaction copyWith({
+  RecurringTransactionModel copyWith({
     String? id,
     String? userId,
     String? accountId,
@@ -32,7 +32,7 @@ class RecurringTransaction {
     DateTime? endDate,
     String? status,
   }) {
-    return RecurringTransaction(
+    return RecurringTransactionModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       accountId: accountId ?? this.accountId,
@@ -45,8 +45,8 @@ class RecurringTransaction {
     );
   }
 
-  factory RecurringTransaction.fromMap(Map<String, dynamic> map) {
-    return RecurringTransaction(
+  factory RecurringTransactionModel.fromMap(Map<String, dynamic> map) {
+    return RecurringTransactionModel(
       id: map['id'],
       userId: map['user_id'],
       accountId: map['account_id'],

@@ -1,4 +1,4 @@
-class Transaction {
+class TransactionModel {
   final String id;
   final String userId;
   final String accountId;
@@ -9,7 +9,7 @@ class Transaction {
   final DateTime date;
   final String description;
 
-  Transaction({
+  TransactionModel({
     required this.id,
     required this.userId,
     required this.accountId,
@@ -21,7 +21,7 @@ class Transaction {
     required this.description,
   });
 
-  Transaction copyWith({
+  TransactionModel copyWith({
     String? id,
     String? userId,
     String? accountId,
@@ -32,7 +32,7 @@ class Transaction {
     DateTime? date,
     String? description,
   }) {
-    return Transaction(
+    return TransactionModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       accountId: accountId ?? this.accountId,
@@ -45,8 +45,8 @@ class Transaction {
     );
   }
 
-  factory Transaction.fromMap(Map<String, dynamic> map) {
-    return Transaction(
+  factory TransactionModel.fromMap(Map<String, dynamic> map) {
+    return TransactionModel(
       id: map['id'],
       userId: map['user_id'],
       accountId: map['account_id'],

@@ -1,4 +1,4 @@
-class Account {
+class AccountModel {
   final String id;
   final String userId;
   final String name;
@@ -7,7 +7,7 @@ class Account {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  Account({
+  AccountModel({
     required this.id,
     required this.userId,
     required this.name,
@@ -17,7 +17,7 @@ class Account {
     required this.updatedAt,
   });
 
-  Account copyWith({
+  AccountModel copyWith({
     String? id,
     String? userId,
     String? name,
@@ -26,7 +26,7 @@ class Account {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return Account(
+    return AccountModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       name: name ?? this.name,
@@ -37,8 +37,8 @@ class Account {
     );
   }
 
-  factory Account.fromMap(Map<String, dynamic> map) {
-    return Account(
+  factory AccountModel.fromMap(Map<String, dynamic> map) {
+    return AccountModel(
       id: map['id'],
       userId: map['user_id'],
       name: map['name'],

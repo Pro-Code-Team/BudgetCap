@@ -1,4 +1,4 @@
-class Budget {
+class BudgetModel {
   final String id;
   final String userId;
   final String name;
@@ -7,7 +7,7 @@ class Budget {
   final DateTime endDate;
   final String status;
 
-  Budget({
+  BudgetModel({
     required this.id,
     required this.userId,
     required this.name,
@@ -17,7 +17,7 @@ class Budget {
     required this.status,
   });
 
-  Budget copyWith({
+  BudgetModel copyWith({
     String? id,
     String? userId,
     String? name,
@@ -26,7 +26,7 @@ class Budget {
     DateTime? endDate,
     String? status,
   }) {
-    return Budget(
+    return BudgetModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       name: name ?? this.name,
@@ -37,8 +37,8 @@ class Budget {
     );
   }
 
-  factory Budget.fromMap(Map<String, dynamic> map) {
-    return Budget(
+  factory BudgetModel.fromMap(Map<String, dynamic> map) {
+    return BudgetModel(
       id: map['id'],
       userId: map['user_id'],
       name: map['name'],

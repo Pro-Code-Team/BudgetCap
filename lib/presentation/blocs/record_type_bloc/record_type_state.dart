@@ -3,7 +3,7 @@ part of 'record_type_bloc.dart';
 class RecordTypeState extends Equatable {
   final Enum selectedValue;
 
-  RecordTypeState({Enum? selectedValue})
+  const RecordTypeState({Enum? selectedValue})
       : selectedValue = selectedValue ?? Operations.income;
 
   RecordTypeState copyWith({

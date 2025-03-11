@@ -1,6 +1,6 @@
+import 'package:budgetcap/domain/entities/category.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:budgetcap/infrastructure/models/category_model.dart';
 
 part 'category_bloc_event.dart';
 part 'category_bloc_state.dart';

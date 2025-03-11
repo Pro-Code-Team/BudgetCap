@@ -1,11 +1,11 @@
-class Category {
+class CategoryModel {
   final String id;
   final String userId;
   final String name;
   final String type;
   final String icon; // New field for the category icon
 
-  Category({
+  CategoryModel({
     required this.id,
     required this.userId,
     required this.name,
@@ -13,14 +13,14 @@ class Category {
     required this.icon, // Include the new field in the constructor
   });
 
-  Category copyWith({
+  CategoryModel copyWith({
     String? id,
     String? userId,
     String? name,
     String? type,
     String? icon, // Include the new field in the copyWith method
   }) {
-    return Category(
+    return CategoryModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       name: name ?? this.name,
@@ -29,8 +29,8 @@ class Category {
     );
   }
 
-  factory Category.fromMap(Map<String, dynamic> map) {
-    return Category(
+  factory CategoryModel.fromMap(Map<String, dynamic> map) {
+    return CategoryModel(
       id: map['id'],
       userId: map['user_id'],
       name: map['name'],

@@ -1,4 +1,4 @@
-class User {
+class UserModel {
   final String id;
   final String name;
   final String email;
@@ -7,7 +7,7 @@ class User {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  User({
+  UserModel({
     required this.id,
     required this.name,
     required this.email,
@@ -17,7 +17,7 @@ class User {
     required this.updatedAt,
   });
 
-  User copyWith({
+  UserModel copyWith({
     String? id,
     String? name,
     String? email,
@@ -26,7 +26,7 @@ class User {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return User(
+    return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
@@ -37,8 +37,8 @@ class User {
     );
   }
 
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
       id: map['id'],
       name: map['name'],
       email: map['email'],
