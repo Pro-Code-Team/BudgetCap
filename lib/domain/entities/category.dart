@@ -1,31 +1,27 @@
 class Category {
   final String id;
-  final String userId;
-  final String icon;
   final String name;
-  final String type;
+  final String icon;
+  final String description;
 
   Category({
     required this.id,
-    required this.userId,
     required this.name,
     required this.icon,
-    required this.type,
+    required this.description,
   });
 
   Category copyWith({
     String? id,
-    String? userId,
     String? name,
     String? icon,
-    String? type,
+    String? description,
   }) {
     return Category(
       id: id ?? this.id,
-      userId: userId ?? this.userId,
       name: name ?? this.name,
       icon: icon ?? this.icon,
-      type: type ?? this.type,
+      description: description ?? this.description,
     );
   }
 }

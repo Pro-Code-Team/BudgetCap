@@ -1,5 +1,6 @@
 import 'package:budgetcap/domain/datasource/transaction_datasource.dart';
 import 'package:budgetcap/domain/entities/transaction.dart';
+import 'package:budgetcap/infrastructure/mappers/transaction_mapper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TransactionDatasourceImpl extends TransactionDatasource {
@@ -40,9 +41,19 @@ class TransactionDatasourceImpl extends TransactionDatasource {
 
   @override
   Future<String> recordTransaction(Transaction transaction) async {
-    final data =
-        await _supabase.from('transactions').upsert(transaction).select();
-    return data.first['id'].toString();
+    try {
+      final transactionSupabase =
+          TransactionMapper.toModel(transaction).toMap();
+      final data = await _supabase
+          .from('transactions')
+          .upsert(transactionSupabase)
+          .select();
+      print(data);
+      return data.first['id'].toString();
+    } catch (e) {
+      print(e);
+      return '';
+    }
   }
 
   @override

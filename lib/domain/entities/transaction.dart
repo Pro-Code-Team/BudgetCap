@@ -1,45 +1,37 @@
 class Transaction {
-  final String id;
-  final String userId;
-  final String accountId;
-  final String categoryId;
-  final String? budgetId;
+  final int id;
+  final int accountId;
+  final int categoryId;
   final double amount;
-  final String transactionType;
+  final String type;
   final DateTime date;
   final String description;
 
   Transaction({
     required this.id,
-    required this.userId,
     required this.accountId,
     required this.categoryId,
-    this.budgetId,
     required this.amount,
-    required this.transactionType,
+    required this.type,
     required this.date,
     required this.description,
   });
 
   Transaction copyWith({
-    String? id,
-    String? userId,
-    String? accountId,
-    String? categoryId,
-    String? budgetId,
+    int? id,
+    int? accountId,
+    int? categoryId,
     double? amount,
-    String? transactionType,
+    String? type,
     DateTime? date,
     String? description,
   }) {
     return Transaction(
       id: id ?? this.id,
-      userId: userId ?? this.userId,
       accountId: accountId ?? this.accountId,
       categoryId: categoryId ?? this.categoryId,
-      budgetId: budgetId ?? this.budgetId,
       amount: amount ?? this.amount,
-      transactionType: transactionType ?? this.transactionType,
+      type: type ?? this.type,
       date: date ?? this.date,
       description: description ?? this.description,
     );

@@ -6,6 +6,7 @@ class TransactionBlocState extends Equatable {
   final String message;
   final List<Transaction> transactions;
 
+//We initialize the parameter when loading the widget for the first time.
   const TransactionBlocState(
       {this.isInProgress = false,
       this.message = '',
