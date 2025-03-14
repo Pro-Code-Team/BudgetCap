@@ -1,5 +1,5 @@
 class Category {
-  final String id;
+  final int id;
   final String name;
   final String icon;
   final String description;
@@ -12,7 +12,7 @@ class Category {
   });
 
   Category copyWith({
-    String? id,
+    int? id,
     String? name,
     String? icon,
     String? description,

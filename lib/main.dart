@@ -1,8 +1,10 @@
 import 'package:budgetcap/config/constants/variables.dart';
+import 'package:budgetcap/infrastructure/datasource/category_datasource_impl.dart';
 import 'package:budgetcap/infrastructure/datasource/transaction_datasource_impl.dart';
+import 'package:budgetcap/infrastructure/repositories/category_repository_impl.dart';
 import 'package:budgetcap/infrastructure/repositories/transaction_repository_impl.dart';
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
-import 'package:budgetcap/presentation/blocs/category/category_bloc.dart';
+import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
 import 'package:budgetcap/presentation/blocs/form_bloc/form_bloc.dart';
 import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
@@ -29,9 +31,15 @@ Future main() async {
   final TransactionDatasourceImpl transactionDatasource =
       TransactionDatasourceImpl(supabase: supabase);
 
+  final CategoryDatasourceImpl categoryDatasource =
+      CategoryDatasourceImpl(supabase: supabase);
+
   // Create a new instance of the repository
   final TransactionRepositoryImpl transactionRepository =
       TransactionRepositoryImpl(transactionDatasource: transactionDatasource);
+
+  final CategoryRepositoryImpl categoryRepository =
+      CategoryRepositoryImpl(categoryDatasource: categoryDatasource);
 
   // Run the app
   runApp(MultiBlocProvider(providers: [
@@ -45,7 +53,7 @@ Future main() async {
       create: (_) => AccountBloc(),
     ),
     BlocProvider<CategoryBloc>(
-      create: (_) => CategoryBloc(),
+      create: (context) => CategoryBloc(categoryRepository),
     ),
     BlocProvider<TransactionBloc>(
       create: (_) => TransactionBloc(repo: transactionRepository),

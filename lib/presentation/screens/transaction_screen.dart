@@ -1,5 +1,5 @@
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
-import 'package:budgetcap/presentation/blocs/category/category_bloc.dart';
+import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
 import 'package:budgetcap/presentation/blocs/form_bloc/form_bloc.dart';
 import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
@@ -299,6 +299,18 @@ class CategoriesView extends StatelessWidget {
       child: SingleChildScrollView(
         child: BlocBuilder<CategoryBloc, CategoryState>(
           builder: (context, state) {
+            if (state.isInProgress) {
+              return const Center(
+                heightFactor: 10,
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (state.message.isNotEmpty) {
+              return Center(
+                heightFactor: 10,
+                child: Text(state.message),
+              );
+            }
             return GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
