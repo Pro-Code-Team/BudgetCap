@@ -1,5 +1,5 @@
 class TransactionModel {
-  final int id;
+  final int? id;
   final int accountId;
   final int categoryId;
   final double amount;
@@ -8,7 +8,7 @@ class TransactionModel {
   final String description;
 
   TransactionModel({
-    required this.id,
+    this.id,
     required this.accountId,
     required this.categoryId,
     required this.amount,
@@ -30,8 +30,7 @@ class TransactionModel {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
+    final Map<String, dynamic> map = {
       'account_id': accountId,
       'category_id': categoryId,
       'amount': amount,
@@ -39,5 +38,11 @@ class TransactionModel {
       'date': date.toIso8601String(),
       'description': description,
     };
+
+    if (id != null) {
+      map['id'] = id;
+    }
+
+    return map;
   }
 }

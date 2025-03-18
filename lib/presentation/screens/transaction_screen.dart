@@ -1,3 +1,4 @@
+import 'package:budgetcap/domain/entities/account.dart';
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
@@ -15,12 +16,6 @@ class TransactionScreen extends StatelessWidget {
 
   final Operations view = Operations.income;
   final List<String> accounts = ['Ficohsa', 'BAC', 'Banpro', 'LAFISE'];
-  final List<String> categories = [
-    'Food & Drinks',
-    'Shopping',
-    'Housing',
-    'Vehicle'
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +25,8 @@ class TransactionScreen extends StatelessWidget {
           return FloatingActionButton(
             onPressed: state.isValid
                 ? () {
-                    context
-                        .read<FormControlBloc>()
-                        .add(FormSubmitted(formData: state.formData));
+                    context.read<FormControlBloc>().add(FormSubmitted(
+                        formData: state.formData, context: context));
                   }
                 : null,
             child: const Icon(Icons.check),
@@ -199,14 +193,24 @@ class AccountSelection extends StatelessWidget {
         )),
         BlocBuilder<AccountBloc, AccountState>(
           builder: (context, state) {
-            return DropdownMenu<String>(
-                initialSelection: state.selectedAccount,
-                dropdownMenuEntries: state.accounts
-                    .map(
-                      (String option) =>
-                          DropdownMenuEntry(value: option, label: option),
-                    )
-                    .toList());
+            return DropdownButton<int>(
+              value: state.accountSelected,
+              items: state.accounts.map<DropdownMenuItem<int>>((Account value) {
+                return DropdownMenuItem<int>(
+                  value: value.id,
+                  child: Text(
+                    value.name,
+                  ),
+                );
+              }).toList(),
+              onChanged: (int? newValue) {
+                if (newValue != null) {
+                  context
+                      .read<AccountBloc>()
+                      .add(AccountSelected(accountSelected: newValue));
+                }
+              },
+            );
           },
         ),
       ],
@@ -323,12 +327,17 @@ class CategoriesView extends StatelessWidget {
               itemBuilder: (context, index) {
                 final category = state.categories[index];
                 final iconName = category.icon;
-                return InkWell(
-                  onTap: () {},
-                  borderRadius: BorderRadius.circular(20),
-                  splashColor: const Color.fromARGB(255, 156, 143, 193),
+                return GestureDetector(
+                  onTap: () {
+                    context
+                        .read<CategoryBloc>()
+                        .add(CategoryChanged(categorySelected: index));
+                  },
                   child: Container(
                     decoration: BoxDecoration(
+                      color: index == state.categorySelected
+                          ? const Color.fromARGB(255, 156, 143, 193)
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: Colors.grey,

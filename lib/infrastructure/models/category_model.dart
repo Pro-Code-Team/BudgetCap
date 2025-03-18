@@ -1,11 +1,11 @@
 class CategoryModel {
-  final int id;
+  final int? id;
   final String name;
   final String icon;
   final String description;
 
   CategoryModel({
-    required this.id,
+    this.id,
     required this.name,
     required this.icon,
     required this.description,

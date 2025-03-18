@@ -9,6 +9,7 @@ class CategoryInitial extends CategoryEvent {
 }
 
 class CategoryChanged extends CategoryEvent {
-  final Category selectedCategory;
-  const CategoryChanged(this.selectedCategory);
+  final int categorySelected;
+
+  CategoryChanged({required this.categorySelected});
 }

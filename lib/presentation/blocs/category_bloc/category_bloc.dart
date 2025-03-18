@@ -12,6 +12,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
 
   CategoryBloc(this._categoryRepository) : super(const CategoryState()) {
     on<CategoryInitial>(_onCategoryInitial);
+    on<CategoryChanged>(_onCategoryChanged);
     // Dispatch the CategoryInitial event when the bloc is created
     add(const CategoryInitial());
   }
@@ -32,5 +33,10 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     } catch (e) {
       emit(state.copyWith(message: e.toString(), isInProgress: false));
     }
+  }
+
+  void _onCategoryChanged(CategoryChanged event, Emitter<CategoryState> emit) {
+    emit(state.copyWith(categorySelected: event.categorySelected));
+    print(state.categorySelected);
   }
 }

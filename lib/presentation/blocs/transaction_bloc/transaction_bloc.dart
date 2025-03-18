@@ -8,13 +8,13 @@ part 'transaction_bloc_event.dart';
 part 'transaction_bloc_state.dart';
 
 class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
-  final TransactionRepositoryImpl repo;
+  final TransactionRepositoryImpl _repo;
 
-  TransactionBloc({required this.repo}) : super(const TransactionBlocState()) {
+  TransactionBloc(this._repo) : super(const TransactionBlocState()) {
     on<RecordTransaction>((event, emit) async {
       emit(state.copyWith(isInProgress: true));
       try {
-        await repo.recordTransaction(event.transaction);
+        await _repo.recordTransaction(event.transaction);
         emit(state.copyWith(isInProgress: false));
       } catch (e) {
         emit(state.copyWith(isInProgress: false, message: e.toString()));

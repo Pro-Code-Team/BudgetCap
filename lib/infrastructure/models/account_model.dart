@@ -1,10 +1,10 @@
 class AccountModel {
-  final String id;
+  final int? id;
   final String name;
   final String description;
 
   AccountModel({
-    required this.id,
+    this.id,
     required this.name,
     required this.description,
   });

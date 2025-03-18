@@ -1,5 +1,5 @@
 class Transaction {
-  final int id;
+  final int? id;
   final int accountId;
   final int categoryId;
   final double amount;
@@ -8,7 +8,7 @@ class Transaction {
   final String description;
 
   Transaction({
-    required this.id,
+    this.id,
     required this.accountId,
     required this.categoryId,
     required this.amount,

@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CategoryDatasourceImpl extends CategoryDatasource {
   final SupabaseClient _supabase;
-  final String _tableName = 'categories';
+  static const String _tableName = 'categories';
 
   CategoryDatasourceImpl({required SupabaseClient supabase})
       : _supabase = supabase;

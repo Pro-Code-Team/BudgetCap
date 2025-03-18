@@ -1,5 +1,10 @@
 import 'package:budgetcap/domain/entities/transaction.dart';
+import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
+import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
+import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
+import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
 import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -23,6 +28,10 @@ class FormControlBloc extends Bloc<FormControlEvent, FormControlState> {
 
   Future<void> _onFormSubmitted(
       FormSubmitted event, Emitter<FormControlState> emit) async {
+    final recordTypeBloc = event.context.read<RecordTypeBloc>().state;
+    final dateBloc = event.context.read<DatePickerBloc>().state;
+    final accountBloc = event.context.read<AccountBloc>().state;
+    final categoryBloc = event.context.read<CategoryBloc>().state;
     final formData = state.formData;
 
     if (formData['Amount'] == null || formData['Amount']!.isEmpty) {
@@ -30,15 +39,16 @@ class FormControlBloc extends Bloc<FormControlEvent, FormControlState> {
       print(state.isValid);
     } else {
       emit(state.copyWith(isValid: true, errorMessage: ''));
-      print(formData);
+      print(recordTypeBloc.selectedValue.name);
+
       transactionBloc.add(RecordTransaction(
         Transaction(
-            id: 1,
-            accountId: 1,
-            type: 'Income',
+            accountId: accountBloc.accountSelected,
+            type: recordTypeBloc.selectedValue.name,
             amount: double.parse(formData['Amount']!),
-            categoryId: 1,
-            date: DateTime.now(),
+            categoryId:
+                categoryBloc.categories[categoryBloc.categorySelected].id!,
+            date: dateBloc.selectedDate,
             description: formData['Description'] ?? ''),
       ));
     }

@@ -16,6 +16,7 @@ class FormFieldChanged extends FormControlEvent {
 
 class FormSubmitted extends FormControlEvent {
   final Map<String, String> formData;
+  final BuildContext context;
 
-  FormSubmitted({required this.formData});
+  FormSubmitted({required this.formData, required this.context});
 }

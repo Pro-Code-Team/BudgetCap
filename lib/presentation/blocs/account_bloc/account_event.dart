@@ -9,7 +9,7 @@ class AccountInitial extends AccountEvent {
 }
 
 class AccountSelected extends AccountEvent {
-  final String account;
+  final int accountSelected;
 
-  const AccountSelected(this.account);
+  const AccountSelected({required this.accountSelected});
 }
