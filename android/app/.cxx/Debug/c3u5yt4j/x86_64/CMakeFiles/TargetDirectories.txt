@@ -1,0 +1,2 @@
+/Users/joshua/development/Flutter Cero a Experto/BudgetCap/android/app/.cxx/Debug/c3u5yt4j/x86_64/CMakeFiles/edit_cache.dir
+/Users/joshua/development/Flutter Cero a Experto/BudgetCap/android/app/.cxx/Debug/c3u5yt4j/x86_64/CMakeFiles/rebuild_cache.dir
