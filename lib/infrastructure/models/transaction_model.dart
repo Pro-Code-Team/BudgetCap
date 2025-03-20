@@ -22,7 +22,9 @@ class TransactionModel {
       id: map['id'],
       accountId: map['account_id'],
       categoryId: map['category_id'],
-      amount: map['amount'],
+      amount: (map['amount'] is int)
+          ? (map['amount'] as int).toDouble()
+          : map['amount'],
       type: map['type'],
       date: DateTime.parse(map['date']),
       description: map['description'],
