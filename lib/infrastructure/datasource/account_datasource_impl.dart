@@ -26,4 +26,18 @@ class AccountDatasourceImpl extends AccountDatasource {
     }
     return response;
   }
+
+  @override
+  Future<String> addAccount(Account account) async {
+    //
+    try {
+      final accountSupabase = AccountMapper.toModel(account).toMap();
+      final data =
+          await _supabase.from(_tableName).upsert(accountSupabase).select();
+
+      return data.first['id'].toString();
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 }

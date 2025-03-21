@@ -12,6 +12,7 @@ import 'package:budgetcap/presentation/blocs/form_bloc/form_bloc.dart';
 import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
 import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart';
 import 'package:budgetcap/presentation/screens/all_transactions_screen.dart';
+import 'package:budgetcap/presentation/screens/new_account_screen.dart';
 import 'package:budgetcap/presentation/screens/transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -87,6 +88,6 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: AllTransactionsScreen());
+        home: NewAccountScreen());
   }
 }

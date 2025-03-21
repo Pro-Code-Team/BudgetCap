@@ -13,3 +13,9 @@ class AccountSelected extends AccountEvent {
 
   const AccountSelected({required this.accountSelected});
 }
+
+class RecordAccount extends AccountEvent {
+  final Account account;
+
+  RecordAccount({required this.account});
+}

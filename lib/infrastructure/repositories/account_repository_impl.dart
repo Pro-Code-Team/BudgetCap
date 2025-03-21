@@ -12,4 +12,9 @@ class AccountRepositoryImpl extends AccountRepository {
   Future<List<Account>> getAllAccounts() async {
     return await _datasource.getAllAccounts();
   }
+
+  @override
+  Future<String> addAccount(Account account) async {
+    return await _datasource.addAccount(account);
+  }
 }
