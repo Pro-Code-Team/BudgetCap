@@ -13,3 +13,22 @@ class RecordTransaction extends TransactionBlocEvent {
 
   const RecordTransaction(this.transaction);
 }
+
+//FORM HANDLERS
+
+class FormFieldChanged extends TransactionBlocEvent {
+  final String fieldName;
+  final String fieldValue;
+
+  const FormFieldChanged({
+    required this.fieldName,
+    required this.fieldValue,
+  });
+}
+
+class FormSubmitted extends TransactionBlocEvent {
+  final Map<String, String> formData;
+  final BuildContext context;
+
+  FormSubmitted({required this.formData, required this.context});
+}

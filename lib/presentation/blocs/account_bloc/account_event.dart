@@ -19,3 +19,23 @@ class RecordAccount extends AccountEvent {
 
   RecordAccount({required this.account});
 }
+
+//FORM HANDLERS
+
+class FormFieldChanged extends AccountEvent {
+  final String fieldName;
+  final String fieldValue;
+
+  const FormFieldChanged({
+    required this.fieldName,
+    required this.fieldValue,
+  });
+}
+
+class FormSubmitted extends AccountEvent {
+  final Map<String, String> formData;
+
+  FormSubmitted({
+    required this.formData,
+  });
+}

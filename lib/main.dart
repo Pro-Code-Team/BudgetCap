@@ -8,12 +8,12 @@ import 'package:budgetcap/infrastructure/repositories/transaction_repository_imp
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
-import 'package:budgetcap/presentation/blocs/form_bloc/form_bloc.dart';
+
 import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
 import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart';
-import 'package:budgetcap/presentation/screens/all_transactions_screen.dart';
+
 import 'package:budgetcap/presentation/screens/new_account_screen.dart';
-import 'package:budgetcap/presentation/screens/transaction_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -68,10 +68,6 @@ Future main() async {
     BlocProvider<TransactionBloc>(
       create: (_) => TransactionBloc(transactionRepository),
     ),
-    BlocProvider<FormControlBloc>(
-      create: (context) =>
-          FormControlBloc(BlocProvider.of<TransactionBloc>(context)),
-    )
   ], child: const MyApp()));
 }
 

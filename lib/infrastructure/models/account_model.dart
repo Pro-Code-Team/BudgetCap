@@ -27,13 +27,18 @@ class AccountModel {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
+    final Map<String, dynamic> map = {
       'name': name,
       'description': description,
       'currency': currency,
       'icon': icon,
       'color': color,
     };
+
+    if (id != null) {
+      map['id'] = id;
+    }
+
+    return map;
   }
 }

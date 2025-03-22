@@ -2,8 +2,10 @@ import 'package:budgetcap/domain/entities/account.dart';
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
-import 'package:budgetcap/presentation/blocs/form_bloc/form_bloc.dart';
+
 import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
+import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart'
+    as transactionBloc;
 import 'package:budgetcap/presentation/widgets/iconGrabber.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,20 +17,36 @@ class TransactionScreen extends StatelessWidget {
   TransactionScreen({super.key});
 
   final Operations view = Operations.income;
-  final List<String> accounts = ['Ficohsa', 'BAC', 'Banpro', 'LAFISE'];
+  final GlobalKey<FormState> _formKey =
+      GlobalKey<FormState>(); // Define the FormKey
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: BlocBuilder<FormControlBloc, FormControlState>(
+      floatingActionButton: BlocBuilder<transactionBloc.TransactionBloc,
+          transactionBloc.TransactionBlocState>(
         builder: (context, state) {
           return FloatingActionButton(
-            onPressed: state.isValid
-                ? () {
-                    context.read<FormControlBloc>().add(FormSubmitted(
-                        formData: state.formData, context: context));
-                  }
-                : null,
+            onPressed: () {
+              // Trigger form validation
+              if (_formKey.currentState?.validate() ?? false) {
+                // If the form is valid, dispatch the FormSubmitted event
+                context
+                    .read<transactionBloc.TransactionBloc>()
+                    .add(transactionBloc.FormSubmitted(
+                      formData: state.formData,
+                      context: context,
+                    ));
+              } else {
+                // Show an error if the form is invalid
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please fill out all required fields.'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
             child: const Icon(Icons.check),
           );
         },
@@ -36,48 +54,41 @@ class TransactionScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Add Record"),
       ),
-      body: const TransactionView(),
+      body: TransactionView(
+          formKey: _formKey), // Pass the FormKey to TransactionView
     );
   }
 }
 
 class TransactionView extends StatelessWidget {
+  final GlobalKey<FormState> formKey;
+
   const TransactionView({
     super.key,
+    required this.formKey, // Accept the FormKey
   });
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 30),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Column(
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              RecordTypeSelection(),
-              SizedBox(
-                height: 20,
-              ),
-              //DATE SECTION
-              DatePickerSelection(),
-              SizedBox(
-                height: 20,
-              ),
-              RecordInputFields(),
-
-              SizedBox(
-                height: 10,
-              ),
-//Account selection section
-              AccountSelection(),
-              SizedBox(
-                height: 30,
-              ),
+              const RecordTypeSelection(),
+              const SizedBox(height: 20),
+              const DatePickerSelection(),
+              const SizedBox(height: 20),
+              // Pass the FormKey to RecordInputFields
+              RecordInputFields(formKey: formKey),
+              const SizedBox(height: 10),
+              const AccountSelection(),
+              const SizedBox(height: 30),
             ],
           ),
-          //Scrollable GRID
-          CategoriesView(),
+          const CategoriesView(),
         ],
       ),
     );
@@ -85,88 +96,69 @@ class TransactionView extends StatelessWidget {
 }
 
 class RecordInputFields extends StatelessWidget {
+  final GlobalKey<FormState> formKey;
+
   const RecordInputFields({
     super.key,
+    required this.formKey, // Accept the FormKey
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<FormControlBloc, FormControlState>(
-      listener: (context, state) {
-        if (state.isValid) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Form submitted successfully'),
-            ),
-          );
-        } else if (state.errorMessage.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      },
-      builder: (context, state) {
-        return Form(
-          child: Column(
+    return Form(
+      key: formKey, // Assign the FormKey to the Form widget
+      child: Column(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Chip(label: Text("USD")),
-                  SizedBox(
-                    width: 10,
+              const Chip(label: Text("USD")),
+              const SizedBox(width: 10),
+              Flexible(
+                child: TextFormField(
+                  onChanged: (value) {
+                    context.read<transactionBloc.TransactionBloc>().add(
+                        transactionBloc.FormFieldChanged(
+                            fieldValue: value, fieldName: 'Amount'));
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter an amount";
+                    }
+                    if (double.tryParse(value) == null) {
+                      return "Please enter a valid number";
+                    }
+                    return null;
+                  },
+                  textAlign: TextAlign.end,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Amount',
+                    hintText: 'Enter amount',
                   ),
-                  Flexible(
-                    child: TextFormField(
-                      onChanged: (value) {
-                        context.read<FormControlBloc>().add(FormFieldChanged(
-                            value: value, fieldName: 'Amount'));
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return "Enter some text";
-                        }
-                        return null;
-                      },
-                      textAlign: TextAlign.end,
-                      keyboardType: TextInputType
-                          .number, // Set the keyboard type to number
-                      decoration: InputDecoration(
-                        labelText: 'Amount',
-                        hintText: 'Enter amount',
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              ),
-
-              ///General Section
-
-              TextFormField(
-                onChanged: (value) {
-                  context.read<FormControlBloc>().add(
-                      FormFieldChanged(value: value, fieldName: 'Description'));
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return "Enter some text";
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  labelText: 'Description',
-                  hintText: 'Enter a description',
                 ),
               ),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 20),
+          TextFormField(
+            onChanged: (value) {
+              context.read<transactionBloc.TransactionBloc>().add(
+                  transactionBloc.FormFieldChanged(
+                      fieldValue: value, fieldName: 'Description'));
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter a description";
+              }
+              return null;
+            },
+            decoration: const InputDecoration(
+              labelText: 'Description',
+              hintText: 'Enter a description',
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
