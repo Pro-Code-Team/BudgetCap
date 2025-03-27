@@ -1,15 +1,15 @@
-part of 'record_type_bloc.dart';
+part of 'transaction_type_bloc.dart';
 
-class RecordTypeState extends Equatable {
+class TransactionTypeState extends Equatable {
   final Enum selectedValue;
 
-  const RecordTypeState({Enum? selectedValue})
+  const TransactionTypeState({Enum? selectedValue})
       : selectedValue = selectedValue ?? Operations.income;
 
-  RecordTypeState copyWith({
+  TransactionTypeState copyWith({
     Enum? selectedValue,
   }) {
-    return RecordTypeState(
+    return TransactionTypeState(
       selectedValue: selectedValue ?? this.selectedValue,
     );
   }

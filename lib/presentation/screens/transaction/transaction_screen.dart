@@ -1,12 +1,12 @@
 import 'package:budgetcap/domain/entities/account.dart';
+import 'package:budgetcap/domain/entities/transaction.dart';
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
 
-import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
-import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart'
-    as transactionBloc;
-import 'package:budgetcap/presentation/widgets/iconGrabber.dart';
+import 'package:budgetcap/presentation/blocs/transaction_type_bloc/transaction_type_bloc.dart';
+import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart';
+import 'package:budgetcap/presentation/widgets/icon_grabber.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,17 +23,14 @@ class TransactionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: BlocBuilder<transactionBloc.TransactionBloc,
-          transactionBloc.TransactionBlocState>(
+      floatingActionButton: BlocBuilder<TransactionBloc, TransactionBlocState>(
         builder: (context, state) {
           return FloatingActionButton(
             onPressed: () {
               // Trigger form validation
               if (_formKey.currentState?.validate() ?? false) {
                 // If the form is valid, dispatch the FormSubmitted event
-                context
-                    .read<transactionBloc.TransactionBloc>()
-                    .add(transactionBloc.FormSubmitted(
+                context.read<TransactionBloc>().add(TransactionFormSubmitted(
                       formData: state.formData,
                       context: context,
                     ));
@@ -52,7 +49,7 @@ class TransactionScreen extends StatelessWidget {
         },
       ),
       appBar: AppBar(
-        title: const Text("Add Record"),
+        title: const Text("Add Transaction"),
       ),
       body: TransactionView(
           formKey: _formKey), // Pass the FormKey to TransactionView
@@ -60,6 +57,7 @@ class TransactionScreen extends StatelessWidget {
   }
 }
 
+//TODO: Finish loading data from the database on transaction creen.
 class TransactionView extends StatelessWidget {
   final GlobalKey<FormState> formKey;
 
@@ -70,6 +68,12 @@ class TransactionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //Looking for the transaction that came from the selected item on "All transaction list".
+    final transactionBlocState = context.watch<TransactionBloc>().state;
+    final Transaction transaction = transactionBlocState.transactions
+        .firstWhere((element) =>
+            element.id == transactionBlocState.transactionIdSelected);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Column(
@@ -77,12 +81,14 @@ class TransactionView extends StatelessWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const RecordTypeSelection(),
+              RecordTypeSelection(
+                transaction: transaction,
+              ),
               const SizedBox(height: 20),
               const DatePickerSelection(),
               const SizedBox(height: 20),
               // Pass the FormKey to RecordInputFields
-              RecordInputFields(formKey: formKey),
+              TransactionInputFields(formKey: formKey),
               const SizedBox(height: 10),
               const AccountSelection(),
               const SizedBox(height: 30),
@@ -95,10 +101,58 @@ class TransactionView extends StatelessWidget {
   }
 }
 
-class RecordInputFields extends StatelessWidget {
+class RecordTypeSelection extends StatelessWidget {
+  final Transaction? transaction;
+  const RecordTypeSelection({
+    super.key,
+    this.transaction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: BlocBuilder<TransactionTypeBloc, TransactionTypeState>(
+        builder: (context, state) {
+          return SegmentedButton<Operations>(
+            segments: const <ButtonSegment<Operations>>[
+              ButtonSegment(
+                value: Operations.income,
+                label: Text("Income"),
+              ),
+              ButtonSegment(
+                value: Operations.expense,
+                label: Text("Expense"),
+              ),
+              ButtonSegment(
+                value: Operations.transfer,
+                label: Text("Transfer"),
+              )
+            ],
+            selected:
+                context.watch<TransactionBloc>().state.transactionIdSelected ==
+                        -1
+                    ? <Operations>{state.selectedValue as Operations}
+                    : <Operations>{
+                        Operations.values.firstWhere(
+                            (element) => element.name == transaction!.type,
+                            orElse: () => state.selectedValue as Operations)
+                      },
+            onSelectionChanged: (selected) {
+              context
+                  .read<TransactionTypeBloc>()
+                  .add(TransactionChanged(selectedRecord: selected.first));
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class TransactionInputFields extends StatelessWidget {
   final GlobalKey<FormState> formKey;
 
-  const RecordInputFields({
+  const TransactionInputFields({
     super.key,
     required this.formKey, // Accept the FormKey
   });
@@ -116,8 +170,8 @@ class RecordInputFields extends StatelessWidget {
               Flexible(
                 child: TextFormField(
                   onChanged: (value) {
-                    context.read<transactionBloc.TransactionBloc>().add(
-                        transactionBloc.FormFieldChanged(
+                    context.read<TransactionBloc>().add(
+                        TransactionFormFieldChanged(
                             fieldValue: value, fieldName: 'Amount'));
                   },
                   validator: (value) {
@@ -142,9 +196,8 @@ class RecordInputFields extends StatelessWidget {
           const SizedBox(height: 20),
           TextFormField(
             onChanged: (value) {
-              context.read<transactionBloc.TransactionBloc>().add(
-                  transactionBloc.FormFieldChanged(
-                      fieldValue: value, fieldName: 'Description'));
+              context.read<TransactionBloc>().add(TransactionFormFieldChanged(
+                  fieldValue: value, fieldName: 'Description'));
             },
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -238,45 +291,6 @@ class DatePickerSelection extends StatelessWidget {
               label: Text(DateFormat.yMMMd()
                   .format(context.read<DatePickerBloc>().state.selectedDate)),
             ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class RecordTypeSelection extends StatelessWidget {
-  const RecordTypeSelection({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: BlocBuilder<RecordTypeBloc, RecordTypeState>(
-        builder: (context, state) {
-          return SegmentedButton<Operations>(
-            segments: const <ButtonSegment<Operations>>[
-              ButtonSegment(
-                value: Operations.income,
-                label: Text("Income"),
-              ),
-              ButtonSegment(
-                value: Operations.expense,
-                label: Text("Expense"),
-              ),
-              ButtonSegment(
-                value: Operations.transfer,
-                label: Text("Transfer"),
-              )
-            ],
-            selected: <Operations>{state.selectedValue as Operations},
-            onSelectionChanged: (selected) {
-              context
-                  .read<RecordTypeBloc>()
-                  .add(RecordChanged(selectedRecord: selected.first));
-              print(selected);
-            },
           );
         },
       ),

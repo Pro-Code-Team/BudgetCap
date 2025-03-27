@@ -1,4 +1,5 @@
 import 'package:budgetcap/config/constants/variables.dart';
+import 'package:budgetcap/config/router/app_router.dart';
 import 'package:budgetcap/infrastructure/datasource/account_datasource_impl.dart';
 import 'package:budgetcap/infrastructure/datasource/category_datasource_impl.dart';
 import 'package:budgetcap/infrastructure/datasource/transaction_datasource_impl.dart';
@@ -9,11 +10,8 @@ import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
 
-import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
+import 'package:budgetcap/presentation/blocs/transaction_type_bloc/transaction_type_bloc.dart';
 import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart';
-
-import 'package:budgetcap/presentation/screens/new_account_screen.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -53,8 +51,8 @@ Future main() async {
 
   // Run the app
   runApp(MultiBlocProvider(providers: [
-    BlocProvider<RecordTypeBloc>(
-      create: (_) => RecordTypeBloc(),
+    BlocProvider<TransactionTypeBloc>(
+      create: (_) => TransactionTypeBloc(),
     ),
     BlocProvider<DatePickerBloc>(
       create: (_) => DatePickerBloc(),
@@ -77,13 +75,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: NewAccountScreen());
+    return MaterialApp.router(
+      routerConfig: appRouter,
+      debugShowCheckedModeBanner: false,
+      title: 'BugdetCap',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+    );
   }
 }

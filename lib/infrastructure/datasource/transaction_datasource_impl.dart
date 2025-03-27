@@ -21,7 +21,6 @@ class TransactionDatasourceImpl extends TransactionDatasource {
   Future<List<Transaction>> getAllTransactions() async {
     try {
       final transactions = await _supabase.from(_tableName).select("*");
-      print(transactions);
       return transactions
           .map(
             (Map<String, dynamic> transaction) => TransactionMapper.toEntity(
@@ -59,7 +58,6 @@ class TransactionDatasourceImpl extends TransactionDatasource {
           TransactionMapper.toModel(transaction).toMap();
       final data =
           await _supabase.from(_tableName).upsert(transactionSupabase).select();
-      print(data);
       return data.first['id'].toString();
     } catch (e) {
       throw Exception(e);

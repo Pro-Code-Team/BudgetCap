@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class IconGrabber extends StatelessWidget {
   final String iconName;
@@ -61,7 +60,6 @@ class IconGrabber extends StatelessWidget {
     'food': Icons.restaurant,
     'entertainment': Icons.movie,
     'utilities': Icons.lightbulb,
-    'savings': Icons.savings,
     'donation': Icons.volunteer_activism,
     'cash': Icons.money,
     'piggy_bank': Icons.savings,

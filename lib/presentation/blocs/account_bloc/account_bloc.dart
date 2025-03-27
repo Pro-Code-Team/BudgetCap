@@ -1,7 +1,5 @@
 import 'package:budgetcap/domain/entities/account.dart';
 import 'package:budgetcap/infrastructure/repositories/account_repository_impl.dart';
-import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 

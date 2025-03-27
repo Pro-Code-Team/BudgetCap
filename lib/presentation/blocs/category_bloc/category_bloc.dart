@@ -37,6 +37,5 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
 
   void _onCategoryChanged(CategoryChanged event, Emitter<CategoryState> emit) {
     emit(state.copyWith(categorySelected: event.categorySelected));
-    print(state.categorySelected);
   }
 }

@@ -5,7 +5,7 @@ import 'package:budgetcap/infrastructure/repositories/transaction_repository_imp
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
-import 'package:budgetcap/presentation/blocs/record_type_bloc/record_type_bloc.dart';
+import 'package:budgetcap/presentation/blocs/transaction_type_bloc/transaction_type_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,14 +18,16 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
   final TransactionRepositoryImpl _repository;
 
   TransactionBloc(this._repository) : super(const TransactionBlocState()) {
-    on<RecordTransaction>(_onRecordTransaction);
-    on<GetAllTransactions>(_onGetAllTransactions);
-    on<FormFieldChanged>(_onFormFieldChanged);
-    on<FormSubmitted>(_onFormSubmitted);
+    on<TransactionCreated>(_onRecordTransaction);
+    on<TransactionFetchAll>(_onGetAllTransactions);
+    on<TransactionFormFieldChanged>(_onFormFieldChanged);
+    on<TransactionFormSubmitted>(_onFormSubmitted);
+    on<TransactionToBeEdited>(_onTransactionToBeEdited);
+    on<TransactionFetchedById>(_onTransactionFetchedById);
   }
 
   Future<void> _onRecordTransaction(
-      RecordTransaction event, Emitter<TransactionBlocState> emit) async {
+      TransactionCreated event, Emitter<TransactionBlocState> emit) async {
     emit(state.copyWith(isInProgress: true));
     try {
       await _repository.recordTransaction(event.transaction);
@@ -36,7 +38,7 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
   }
 
   Future<void> _onGetAllTransactions(
-      GetAllTransactions event, Emitter<TransactionBlocState> emit) async {
+      TransactionFetchAll event, Emitter<TransactionBlocState> emit) async {
     emit(state.copyWith(isInProgress: true));
     try {
       emit(
@@ -49,15 +51,15 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
 
 //FORM EVENTS
   void _onFormFieldChanged(
-      FormFieldChanged event, Emitter<TransactionBlocState> emit) {
+      TransactionFormFieldChanged event, Emitter<TransactionBlocState> emit) {
     final newFormData = Map<String, String>.from(state.formData);
     newFormData[event.fieldName] = event.fieldValue;
     emit(state.copyWith(formData: newFormData));
   }
 
-  Future<void> _onFormSubmitted(
-      FormSubmitted event, Emitter<TransactionBlocState> emit) async {
-    final recordTypeBloc = event.context.read<RecordTypeBloc>().state;
+  Future<void> _onFormSubmitted(TransactionFormSubmitted event,
+      Emitter<TransactionBlocState> emit) async {
+    final recordTypeBloc = event.context.read<TransactionTypeBloc>().state;
     final dateBloc = event.context.read<DatePickerBloc>().state;
     final accountBloc = event.context.read<AccountBloc>().state;
     final categoryBloc = event.context.read<CategoryBloc>().state;
@@ -65,12 +67,10 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
 
     if (formData['Amount'] == null || formData['Amount']!.isEmpty) {
       emit(state.copyWith(isValid: false, message: 'Amount is required'));
-      print(state.isValid);
     } else {
       emit(state.copyWith(isValid: true, message: ''));
-      print(recordTypeBloc.selectedValue.name);
 
-      add(RecordTransaction(
+      add(TransactionCreated(
         Transaction(
             accountId: accountBloc.accountSelected,
             type: recordTypeBloc.selectedValue.name,
@@ -82,4 +82,12 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
       ));
     }
   }
+
+  void _onTransactionToBeEdited(
+      TransactionToBeEdited event, Emitter<TransactionBlocState> emit) {
+    emit(state.copyWith(transactionIdSelected: event.transactionIdSelected));
+  }
+
+  Future<void> _onTransactionFetchedById(
+      TransactionFetchedById event, Emitter<TransactionBlocState> emit) async {}
 }

@@ -2,9 +2,10 @@ import 'package:budgetcap/domain/entities/category.dart';
 import 'package:budgetcap/domain/entities/transaction.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart';
-import 'package:budgetcap/presentation/widgets/iconGrabber.dart';
+import 'package:budgetcap/presentation/widgets/icon_grabber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class AllTransactionsScreen extends StatelessWidget {
@@ -13,21 +14,20 @@ class AllTransactionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Dispatch the GetAllTransactions event when the screen is initialized
-    context.read<TransactionBloc>().add(GetAllTransactions());
-    context.read<CategoryBloc>().add(CategoryInitial());
+    context.read<TransactionBloc>().add(const TransactionFetchAll());
+    context.read<CategoryBloc>().add(const CategoryInitial());
 
     return Scaffold(
       body: SafeArea(
         child: BlocBuilder<TransactionBloc, TransactionBlocState>(
           builder: (context, state) {
             if (state.isInProgress) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (state.message.isNotEmpty) {
               return Center(child: Text(state.message));
             }
-//TODO: Add this logic to the Bloc.
             // Group transactions by date
             final transactionsByDate = <String, List<Transaction>>{};
             for (var transaction in state.transactions) {
@@ -54,34 +54,48 @@ class AllTransactionsScreen extends StatelessWidget {
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 date,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-                          Card(
-                            elevation: 4,
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 16),
-                            child: BlocBuilder<CategoryBloc, CategoryState>(
-                              builder: (context, categoryState) {
-                                final category = categoryState.categories
-                                    .firstWhere(
-                                        (cat) =>
-                                            cat.id == transaction.categoryId,
-                                        orElse: () => Category(
-                                            id: 0,
-                                            name: 'Unknown',
-                                            icon: 'unknown',
-                                            description: 'Unknown'));
-                                return ListTile(
-                                  leading: IconGrabber(iconName: category.icon),
-                                  title: Text(category.name),
-                                  subtitle: Text(transaction.description),
-                                  trailing: Text("C\$ ${transaction.amount}"),
+                          GestureDetector(
+                            onTap: () {
+                              if (transactions.isNotEmpty) {
+                                context.read<TransactionBloc>().add(
+                                    TransactionToBeEdited(
+                                        transactionIdSelected:
+                                            transaction.id ?? -1));
+                                context.push(
+                                  '/transactions/edit',
                                 );
-                              },
+                              }
+                            },
+                            child: Card(
+                              elevation: 4,
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 16),
+                              child: BlocBuilder<CategoryBloc, CategoryState>(
+                                builder: (context, categoryState) {
+                                  final category = categoryState.categories
+                                      .firstWhere(
+                                          (cat) =>
+                                              cat.id == transaction.categoryId,
+                                          orElse: () => Category(
+                                              id: 0,
+                                              name: 'Unknown',
+                                              icon: 'unknown',
+                                              description: 'Unknown'));
+                                  return ListTile(
+                                    leading:
+                                        IconGrabber(iconName: category.icon),
+                                    title: Text(category.name),
+                                    subtitle: Text(transaction.description),
+                                    trailing: Text("C\$ ${transaction.amount}"),
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ],

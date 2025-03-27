@@ -8,6 +8,7 @@ class TransactionBlocState extends Equatable {
   final List<Transaction> transactions;
   final Map<String, String> formData;
   final bool isValid;
+  final int transactionIdSelected;
 
 //We initialize the parameter when loading the widget for the first time.
   const TransactionBlocState(
@@ -16,7 +17,8 @@ class TransactionBlocState extends Equatable {
       this.isInProgress = false,
       this.message = '',
       this.errorMessage = '',
-      this.transactions = const []});
+      this.transactions = const [],
+      this.transactionIdSelected = -1});
 
   TransactionBlocState copyWith({
     bool? isInProgress,
@@ -25,6 +27,7 @@ class TransactionBlocState extends Equatable {
     List<Transaction>? transactions,
     Map<String, String>? formData,
     bool? isValid,
+    int? transactionIdSelected,
   }) {
     return TransactionBlocState(
       isInProgress: isInProgress ?? this.isInProgress,
@@ -33,10 +36,19 @@ class TransactionBlocState extends Equatable {
       transactions: transactions ?? this.transactions,
       formData: formData ?? this.formData,
       isValid: isValid ?? this.isValid,
+      transactionIdSelected:
+          transactionIdSelected ?? this.transactionIdSelected,
     );
   }
 
   @override
-  List<Object> get props =>
-      [isInProgress, message, errorMessage, transactions, formData, isValid];
+  List<Object> get props => [
+        isInProgress,
+        message,
+        errorMessage,
+        transactions,
+        formData,
+        isValid,
+        transactionIdSelected
+      ];
 }

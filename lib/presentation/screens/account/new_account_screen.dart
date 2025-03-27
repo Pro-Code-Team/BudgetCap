@@ -1,8 +1,5 @@
 import 'package:budgetcap/config/constants/variables.dart';
-
-import 'package:budgetcap/domain/entities/account.dart';
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
-import 'package:budgetcap/presentation/widgets/iconGrabber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,12 +7,13 @@ class NewAccountScreen extends StatelessWidget {
   NewAccountScreen({super.key});
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String? selectedCurrency;
-  String? selectedColor;
-  String? selectedIcon;
 
   @override
   Widget build(BuildContext context) {
+    String? selectedCurrency;
+    String? selectedColor;
+    String? selectedIcon;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create New Account'),
