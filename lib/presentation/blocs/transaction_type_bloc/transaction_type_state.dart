@@ -3,8 +3,7 @@ part of 'transaction_type_bloc.dart';
 class TransactionTypeState extends Equatable {
   final Enum selectedValue;
 
-  const TransactionTypeState({Enum? selectedValue})
-      : selectedValue = selectedValue ?? Operations.income;
+  const TransactionTypeState({this.selectedValue = Operations.income});
 
   TransactionTypeState copyWith({
     Enum? selectedValue,

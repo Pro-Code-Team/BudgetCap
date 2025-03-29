@@ -6,6 +6,17 @@ class Variables {
       "No se ha encontrado el Anon Key de Supabase";
 }
 
+enum Operations { transfer, income, expense }
+
+extension OperationsExtension on Operations {
+  static Operations fromName(String? name) {
+    return Operations.values.firstWhere(
+      (operation) => operation.name == name,
+      orElse: () => Operations.transfer, // Valor predeterminado
+    );
+  }
+}
+
 // Icons related to monetary actions
 const Map<String, IconData> icons = {
   'Wallet': Icons.wallet,

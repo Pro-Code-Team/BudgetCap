@@ -4,8 +4,8 @@ sealed class TransactionTypeEvent {
   const TransactionTypeEvent();
 }
 
-class TransactionChanged extends TransactionTypeEvent {
-  final Enum selectedRecord;
+class TransactionTypeChanged extends TransactionTypeEvent {
+  final Enum selectedTransactionType;
 
-  const TransactionChanged({required this.selectedRecord});
+  const TransactionTypeChanged({required this.selectedTransactionType});
 }

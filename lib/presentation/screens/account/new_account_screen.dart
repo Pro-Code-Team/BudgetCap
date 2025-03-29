@@ -1,4 +1,4 @@
-import 'package:budgetcap/config/constants/variables.dart';
+import 'package:budgetcap/config/constants/constants.dart';
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -1,3 +1,5 @@
+import 'package:budgetcap/config/constants/constants.dart';
+
 class TransactionModel {
   final int? id;
   final int accountId;
@@ -18,17 +20,37 @@ class TransactionModel {
   });
 
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
-    return TransactionModel(
-      id: map['id'],
-      accountId: map['account_id'],
-      categoryId: map['category_id'],
-      amount: (map['amount'] is int)
+    try {
+      // Validar y asignar valores
+      final int? id = map['id'];
+      final int accountId =
+          map['account_id'] ?? (throw Exception('account_id is required'));
+      final int categoryId =
+          map['category_id'] ?? (throw Exception('category_id is required'));
+      final double amount = (map['amount'] is int)
           ? (map['amount'] as int).toDouble()
-          : map['amount'],
-      type: map['type'],
-      date: DateTime.parse(map['date']),
-      description: map['description'],
-    );
+          : (map['amount'] is double)
+              ? map['amount']
+              : (throw Exception('amount must be a number'));
+      final Operations type = OperationsExtension.fromName(map['type']);
+      final DateTime date =
+          map['date'] != null ? DateTime.parse(map['date']) : DateTime.now();
+      final String description =
+          map['description'] ?? (throw Exception('description is required'));
+
+      // Crear y devolver la instancia
+      return TransactionModel(
+        id: id,
+        accountId: accountId,
+        categoryId: categoryId,
+        amount: amount,
+        type: type.name,
+        date: date,
+        description: description,
+      );
+    } catch (e) {
+      throw Exception('Error parsing TransactionModel: $e');
+    }
   }
 
   Map<String, dynamic> toMap() {

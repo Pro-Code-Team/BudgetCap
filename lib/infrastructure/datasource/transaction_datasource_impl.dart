@@ -57,7 +57,7 @@ class TransactionDatasourceImpl extends TransactionDatasource {
       final transactionSupabase =
           TransactionMapper.toModel(transaction).toMap();
       final data =
-          await _supabase.from(_tableName).upsert(transactionSupabase).select();
+          await _supabase.from(_tableName).insert(transactionSupabase).select();
       return data.first['id'].toString();
     } catch (e) {
       throw Exception(e);
@@ -66,7 +66,17 @@ class TransactionDatasourceImpl extends TransactionDatasource {
 
   @override
   Future<bool> updateTransaction(Transaction updatedTransaction) async {
-    // TODO: implement updateTransaction
-    throw UnimplementedError();
+    try {
+      final transactionSupabase =
+          TransactionMapper.toModel(updatedTransaction).toMap();
+
+      await _supabase
+          .from(_tableName)
+          .update(transactionSupabase)
+          .eq('id', transactionSupabase['id']);
+      return true;
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 }

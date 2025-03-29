@@ -1,3 +1,4 @@
+import 'package:budgetcap/config/constants/constants.dart';
 import 'package:budgetcap/domain/entities/category.dart';
 import 'package:budgetcap/domain/entities/transaction.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
@@ -18,6 +19,8 @@ class AllTransactionsScreen extends StatelessWidget {
     context.read<CategoryBloc>().add(const CategoryInitial());
 
     return Scaffold(
+      floatingActionButton:
+          FloatingActionButton(child: const Icon(Icons.add), onPressed: () {}),
       body: SafeArea(
         child: BlocBuilder<TransactionBloc, TransactionBlocState>(
           builder: (context, state) {

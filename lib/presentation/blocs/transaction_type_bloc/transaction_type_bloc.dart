@@ -1,4 +1,4 @@
-import 'package:budgetcap/presentation/screens/transaction/transaction_screen.dart';
+import 'package:budgetcap/config/constants/constants.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,8 +9,8 @@ class TransactionTypeBloc
     extends Bloc<TransactionTypeEvent, TransactionTypeState> {
   TransactionTypeBloc() : super(const TransactionTypeState()) {
     //
-    on<TransactionChanged>((event, emit) {
-      emit(state.copyWith(selectedValue: event.selectedRecord));
+    on<TransactionTypeChanged>((event, emit) {
+      emit(state.copyWith(selectedValue: event.selectedTransactionType));
     });
   }
 }

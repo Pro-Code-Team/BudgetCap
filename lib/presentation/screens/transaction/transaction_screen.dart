@@ -1,3 +1,4 @@
+import 'package:budgetcap/config/constants/constants.dart';
 import 'package:budgetcap/domain/entities/account.dart';
 import 'package:budgetcap/domain/entities/transaction.dart';
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
@@ -8,10 +9,9 @@ import 'package:budgetcap/presentation/blocs/transaction_type_bloc/transaction_t
 import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart';
 import 'package:budgetcap/presentation/widgets/icon_grabber.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-enum Operations { transfer, income, expense }
 
 class TransactionScreen extends StatelessWidget {
   TransactionScreen({super.key});
@@ -34,6 +34,7 @@ class TransactionScreen extends StatelessWidget {
                       formData: state.formData,
                       context: context,
                     ));
+                context.pop();
               } else {
                 // Show an error if the form is invalid
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -57,7 +58,6 @@ class TransactionScreen extends StatelessWidget {
   }
 }
 
-//TODO: Finish loading data from the database on transaction creen.
 class TransactionView extends StatelessWidget {
   final GlobalKey<FormState> formKey;
 
@@ -69,7 +69,7 @@ class TransactionView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //Looking for the transaction that came from the selected item on "All transaction list".
-    final transactionBlocState = context.watch<TransactionBloc>().state;
+    final transactionBlocState = context.read<TransactionBloc>().state;
     final Transaction transaction = transactionBlocState.transactions
         .firstWhere((element) =>
             element.id == transactionBlocState.transactionIdSelected);
@@ -81,35 +81,48 @@ class TransactionView extends StatelessWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              RecordTypeSelection(
+              TransactionTypeSelection(
                 transaction: transaction,
               ),
               const SizedBox(height: 20),
-              const DatePickerSelection(),
+              DatePickerSelection(
+                transaction: transaction,
+              ),
               const SizedBox(height: 20),
               // Pass the FormKey to RecordInputFields
-              TransactionInputFields(formKey: formKey),
+              TransactionInputFields(
+                  formKey: formKey, transaction: transaction),
               const SizedBox(height: 10),
-              const AccountSelection(),
+              AccountSelection(
+                transaction: transaction,
+              ),
               const SizedBox(height: 30),
             ],
           ),
-          const CategoriesView(),
+          CategoriesView(
+            transaction: transaction,
+          ),
         ],
       ),
     );
   }
 }
 
-class RecordTypeSelection extends StatelessWidget {
+class TransactionTypeSelection extends StatelessWidget {
   final Transaction? transaction;
-  const RecordTypeSelection({
+  const TransactionTypeSelection({
     super.key,
     this.transaction,
   });
 
   @override
   Widget build(BuildContext context) {
+    //Validating type.
+    if (transaction != null) {
+      context.read<TransactionTypeBloc>().add(TransactionTypeChanged(
+          selectedTransactionType:
+              OperationsExtension.fromName(transaction!.type)));
+    }
     return Center(
       child: BlocBuilder<TransactionTypeBloc, TransactionTypeState>(
         builder: (context, state) {
@@ -128,20 +141,55 @@ class RecordTypeSelection extends StatelessWidget {
                 label: Text("Transfer"),
               )
             ],
-            selected:
-                context.watch<TransactionBloc>().state.transactionIdSelected ==
-                        -1
-                    ? <Operations>{state.selectedValue as Operations}
-                    : <Operations>{
-                        Operations.values.firstWhere(
-                            (element) => element.name == transaction!.type,
-                            orElse: () => state.selectedValue as Operations)
-                      },
+            selected: <Operations>{state.selectedValue as Operations},
             onSelectionChanged: (selected) {
-              context
-                  .read<TransactionTypeBloc>()
-                  .add(TransactionChanged(selectedRecord: selected.first));
+              context.read<TransactionTypeBloc>().add(TransactionTypeChanged(
+                  selectedTransactionType: selected.first));
             },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class DatePickerSelection extends StatelessWidget {
+  final Transaction? transaction;
+  const DatePickerSelection({
+    super.key,
+    this.transaction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    //Validating date.
+    if (transaction != null) {
+      context
+          .read<DatePickerBloc>()
+          .add(DateChanged(selectedDate: transaction!.date));
+    }
+
+    return Center(
+      child: BlocBuilder<DatePickerBloc, DatePickerState>(
+        builder: (context, state) {
+          return GestureDetector(
+            onTap: () async {
+              DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100));
+              //
+              if (context.mounted && pickedDate != null) {
+                context
+                    .read<DatePickerBloc>()
+                    .add(DateChanged(selectedDate: pickedDate));
+              }
+            },
+            child: Chip(
+              avatar: const Icon(Icons.calendar_month),
+              label: Text(DateFormat.yMMMd()
+                  .format(context.read<DatePickerBloc>().state.selectedDate)),
+            ),
           );
         },
       ),
@@ -151,10 +199,12 @@ class RecordTypeSelection extends StatelessWidget {
 
 class TransactionInputFields extends StatelessWidget {
   final GlobalKey<FormState> formKey;
+  final Transaction? transaction;
 
   const TransactionInputFields({
     super.key,
-    required this.formKey, // Accept the FormKey
+    required this.formKey,
+    this.transaction,
   });
 
   @override
@@ -169,6 +219,7 @@ class TransactionInputFields extends StatelessWidget {
               const SizedBox(width: 10),
               Flexible(
                 child: TextFormField(
+                  initialValue: transaction?.amount.toString() ?? '',
                   onChanged: (value) {
                     context.read<TransactionBloc>().add(
                         TransactionFormFieldChanged(
@@ -195,6 +246,7 @@ class TransactionInputFields extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           TextFormField(
+            initialValue: transaction?.description ?? '',
             onChanged: (value) {
               context.read<TransactionBloc>().add(TransactionFormFieldChanged(
                   fieldValue: value, fieldName: 'Description'));
@@ -217,12 +269,21 @@ class TransactionInputFields extends StatelessWidget {
 }
 
 class AccountSelection extends StatelessWidget {
+  final Transaction? transaction;
   const AccountSelection({
     super.key,
+    this.transaction,
   });
 
   @override
   Widget build(BuildContext context) {
+//Validator
+    if (transaction != null) {
+      context
+          .read<AccountBloc>()
+          .add(AccountSelected(accountSelected: transaction!.accountId));
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -263,48 +324,27 @@ class AccountSelection extends StatelessWidget {
   }
 }
 
-class DatePickerSelection extends StatelessWidget {
-  const DatePickerSelection({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: BlocBuilder<DatePickerBloc, DatePickerState>(
-        builder: (context, state) {
-          return GestureDetector(
-            onTap: () async {
-              DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100));
-              //
-              if (context.mounted && pickedDate != null) {
-                context
-                    .read<DatePickerBloc>()
-                    .add(DateChanged(selectedDate: pickedDate));
-              }
-            },
-            child: Chip(
-              avatar: const Icon(Icons.calendar_month),
-              label: Text(DateFormat.yMMMd()
-                  .format(context.read<DatePickerBloc>().state.selectedDate)),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
 class CategoriesView extends StatelessWidget {
+  final Transaction? transaction;
   const CategoriesView({
     super.key,
+    this.transaction,
   });
 
   @override
   Widget build(BuildContext context) {
+    //Validator
+    if (transaction != null) {
+      final int index = context
+          .read<CategoryBloc>()
+          .state
+          .categories
+          .indexWhere((category) => category.id == transaction!.categoryId);
+
+      context
+          .read<CategoryBloc>()
+          .add(CategoryChanged(categorySelected: index));
+    }
     return Expanded(
       child: SingleChildScrollView(
         child: BlocBuilder<CategoryBloc, CategoryState>(

@@ -29,9 +29,24 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
   Future<void> _onRecordTransaction(
       TransactionCreated event, Emitter<TransactionBlocState> emit) async {
     emit(state.copyWith(isInProgress: true));
+    final bool isEditMode = state.transactionIdSelected != -1;
     try {
-      await _repository.recordTransaction(event.transaction);
-      emit(state.copyWith(isInProgress: false));
+      if (isEditMode) {
+        await _repository.updateTransaction(event.transaction);
+        final newTransactions = state.transactions;
+        //Finding index of the updated transaction.
+        newTransactions[newTransactions.indexWhere(
+                (transaction) => transaction.id == event.transaction.id)] =
+            event.transaction;
+
+        emit(state.copyWith(isInProgress: false));
+      } else {
+        await _repository.recordTransaction(event.transaction);
+        final newTransactions = state.transactions;
+        newTransactions.add(event.transaction);
+        emit(
+            state.copyWith(transactions: newTransactions, isInProgress: false));
+      }
     } catch (e) {
       emit(state.copyWith(isInProgress: false, message: e.toString()));
     }
@@ -70,16 +85,35 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     } else {
       emit(state.copyWith(isValid: true, message: ''));
 
-      add(TransactionCreated(
-        Transaction(
-            accountId: accountBloc.accountSelected,
-            type: recordTypeBloc.selectedValue.name,
-            amount: double.parse(formData['Amount']!),
-            categoryId:
-                categoryBloc.categories[categoryBloc.categorySelected].id!,
-            date: dateBloc.selectedDate,
-            description: formData['Description'] ?? ''),
-      ));
+      final bool isEditMode = state.transactionIdSelected != -1;
+
+      final id = state.transactionIdSelected;
+      final accountId = accountBloc.accountSelected;
+      final type = recordTypeBloc.selectedValue.name;
+      final amount = double.parse(formData['Amount']!);
+      final categoryId =
+          categoryBloc.categories[categoryBloc.categorySelected].id!;
+      final date = dateBloc.selectedDate;
+      final description = formData['Description'] ?? '';
+
+      add(TransactionCreated(isEditMode
+          ? Transaction(
+              id: id,
+              accountId: accountId,
+              type: type,
+              amount: amount,
+              categoryId: categoryId,
+              date: date,
+              description: description,
+            )
+          : Transaction(
+              accountId: accountId,
+              type: type,
+              amount: amount,
+              categoryId: categoryId,
+              date: date,
+              description: description,
+            )));
     }
   }
 

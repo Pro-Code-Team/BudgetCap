@@ -1,4 +1,4 @@
-import 'package:budgetcap/config/constants/variables.dart';
+import 'package:budgetcap/config/constants/constants.dart';
 import 'package:budgetcap/config/router/app_router.dart';
 import 'package:budgetcap/infrastructure/datasource/account_datasource_impl.dart';
 import 'package:budgetcap/infrastructure/datasource/category_datasource_impl.dart';

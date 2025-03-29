@@ -49,7 +49,12 @@ final appRouter = GoRouter(
                   path: '/edit',
                   builder: (BuildContext context, GoRouterState state) =>
                       TransactionScreen(),
-                )
+                ),
+                GoRoute(
+                  path: '/create',
+                  builder: (BuildContext context, GoRouterState state) =>
+                      TransactionScreen(),
+                ),
               ],
             ),
           ],
