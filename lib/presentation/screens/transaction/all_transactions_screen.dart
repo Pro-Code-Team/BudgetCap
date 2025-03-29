@@ -3,6 +3,7 @@ import 'package:budgetcap/domain/entities/transaction.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart';
 import 'package:budgetcap/presentation/widgets/icon_grabber.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -66,6 +67,43 @@ class AllTransactionsScreen extends StatelessWidget {
                               ),
                             ),
                           Dismissible(
+                            resizeDuration: const Duration(milliseconds: 200),
+                            dragStartBehavior: DragStartBehavior.down,
+                            background: Container(
+                              color: Colors.red,
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              child: const Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                            ),
+                            confirmDismiss: (direction) {
+                              return showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text("Eliminar transacción"),
+                                    content: const Text(
+                                        "¿Estás seguro de que deseas eliminar esta transacción?"),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(false);
+                                        },
+                                        child: const Text("Cancelar"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                        child: const Text("Eliminar"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                             key: Key(transaction.id.toString()),
                             onDismissed: (direction) {
                               context.read<TransactionBloc>().add(
@@ -78,7 +116,7 @@ class AllTransactionsScreen extends StatelessWidget {
                                         "${transaction.description} eliminado")),
                               );
                             },
-                            background: Container(color: Colors.red),
+                            /*      background: Container(color: Colors.red), */
                             direction: DismissDirection.endToStart,
                             child: GestureDetector(
                               onTap: () {
