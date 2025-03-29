@@ -18,18 +18,18 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
   final TransactionRepositoryImpl _repository;
 
   TransactionBloc(this._repository) : super(const TransactionBlocState()) {
-    on<TransactionCreated>(_onRecordTransaction);
-    on<TransactionFetchAll>(_onGetAllTransactions);
-    on<TransactionFormFieldChanged>(_onFormFieldChanged);
-    on<TransactionFormSubmitted>(_onFormSubmitted);
-    on<TransactionToBeEdited>(_onTransactionToBeEdited);
+    on<TransactionCreated>(_onTransactionCreated);
+    on<TransactionFetchAll>(_onTransactionFetchAll);
+    on<TransactionFormFieldChanged>(_onTransactionFormFieldChanged);
+    on<TransactionFormSubmitted>(_onTransactionFormSubmitted);
     on<TransactionFetchedById>(_onTransactionFetchedById);
   }
 
-  Future<void> _onRecordTransaction(
+  Future<void> _onTransactionCreated(
       TransactionCreated event, Emitter<TransactionBlocState> emit) async {
     emit(state.copyWith(isInProgress: true));
-    final bool isEditMode = state.transactionIdSelected != -1;
+    final bool isEditMode = event.transaction.id != null;
+
     try {
       if (isEditMode) {
         await _repository.updateTransaction(event.transaction);
@@ -52,7 +52,7 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     }
   }
 
-  Future<void> _onGetAllTransactions(
+  Future<void> _onTransactionFetchAll(
       TransactionFetchAll event, Emitter<TransactionBlocState> emit) async {
     emit(state.copyWith(isInProgress: true));
     try {
@@ -65,14 +65,15 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
   }
 
 //FORM EVENTS
-  void _onFormFieldChanged(
+  void _onTransactionFormFieldChanged(
       TransactionFormFieldChanged event, Emitter<TransactionBlocState> emit) {
-    final newFormData = Map<String, String>.from(state.formData);
+    final Map<String, String> newFormData =
+        Map<String, String>.from(state.formData);
     newFormData[event.fieldName] = event.fieldValue;
     emit(state.copyWith(formData: newFormData));
   }
 
-  Future<void> _onFormSubmitted(TransactionFormSubmitted event,
+  Future<void> _onTransactionFormSubmitted(TransactionFormSubmitted event,
       Emitter<TransactionBlocState> emit) async {
     final recordTypeBloc = event.context.read<TransactionTypeBloc>().state;
     final dateBloc = event.context.read<DatePickerBloc>().state;
@@ -85,9 +86,8 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     } else {
       emit(state.copyWith(isValid: true, message: ''));
 
-      final bool isEditMode = state.transactionIdSelected != -1;
-
-      final id = state.transactionIdSelected;
+      final int? transactionId = event.transactionId;
+      final id = transactionId;
       final accountId = accountBloc.accountSelected;
       final type = recordTypeBloc.selectedValue.name;
       final amount = double.parse(formData['Amount']!);
@@ -96,30 +96,29 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
       final date = dateBloc.selectedDate;
       final description = formData['Description'] ?? '';
 
-      add(TransactionCreated(isEditMode
-          ? Transaction(
-              id: id,
-              accountId: accountId,
-              type: type,
-              amount: amount,
-              categoryId: categoryId,
-              date: date,
-              description: description,
-            )
-          : Transaction(
-              accountId: accountId,
-              type: type,
-              amount: amount,
-              categoryId: categoryId,
-              date: date,
-              description: description,
-            )));
+      add(
+        TransactionCreated(
+          transactionId != null
+              ? Transaction(
+                  id: id,
+                  accountId: accountId,
+                  type: type,
+                  amount: amount,
+                  categoryId: categoryId,
+                  date: date,
+                  description: description,
+                )
+              : Transaction(
+                  accountId: accountId,
+                  type: type,
+                  amount: amount,
+                  categoryId: categoryId,
+                  date: date,
+                  description: description,
+                ),
+        ),
+      );
     }
-  }
-
-  void _onTransactionToBeEdited(
-      TransactionToBeEdited event, Emitter<TransactionBlocState> emit) {
-    emit(state.copyWith(transactionIdSelected: event.transactionIdSelected));
   }
 
   Future<void> _onTransactionFetchedById(

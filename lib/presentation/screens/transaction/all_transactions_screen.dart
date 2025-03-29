@@ -1,4 +1,3 @@
-import 'package:budgetcap/config/constants/constants.dart';
 import 'package:budgetcap/domain/entities/category.dart';
 import 'package:budgetcap/domain/entities/transaction.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
@@ -48,7 +47,7 @@ class AllTransactionsScreen extends StatelessWidget {
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final transaction = transactions[index];
+                      final Transaction transaction = transactions[index];
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -65,15 +64,8 @@ class AllTransactionsScreen extends StatelessWidget {
                             ),
                           GestureDetector(
                             onTap: () {
-                              if (transactions.isNotEmpty) {
-                                context.read<TransactionBloc>().add(
-                                    TransactionToBeEdited(
-                                        transactionIdSelected:
-                                            transaction.id ?? -1));
-                                context.push(
-                                  '/transactions/edit',
-                                );
-                              }
+                              context.push('/transactions/edit',
+                                  extra: transaction);
                             },
                             child: Card(
                               elevation: 4,

@@ -27,16 +27,10 @@ class TransactionFormFieldChanged extends TransactionBlocEvent {
 }
 
 class TransactionFormSubmitted extends TransactionBlocEvent {
-  final Map<String, String> formData;
+  final int? transactionId;
   final BuildContext context;
 
-  TransactionFormSubmitted({required this.formData, required this.context});
-}
-
-class TransactionToBeEdited extends TransactionBlocEvent {
-  final int transactionIdSelected;
-
-  TransactionToBeEdited({required this.transactionIdSelected});
+  TransactionFormSubmitted({this.transactionId, required this.context});
 }
 
 class TransactionFetchedById extends TransactionBlocEvent {

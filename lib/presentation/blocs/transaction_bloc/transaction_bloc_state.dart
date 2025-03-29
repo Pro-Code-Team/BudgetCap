@@ -8,17 +8,16 @@ class TransactionBlocState extends Equatable {
   final List<Transaction> transactions;
   final Map<String, String> formData;
   final bool isValid;
-  final int transactionIdSelected;
 
 //We initialize the parameter when loading the widget for the first time.
-  const TransactionBlocState(
-      {this.formData = const {},
-      this.isValid = false,
-      this.isInProgress = false,
-      this.message = '',
-      this.errorMessage = '',
-      this.transactions = const [],
-      this.transactionIdSelected = -1});
+  const TransactionBlocState({
+    this.formData = const {},
+    this.isValid = false,
+    this.isInProgress = false,
+    this.message = '',
+    this.errorMessage = '',
+    this.transactions = const [],
+  });
 
   TransactionBlocState copyWith({
     bool? isInProgress,
@@ -27,7 +26,6 @@ class TransactionBlocState extends Equatable {
     List<Transaction>? transactions,
     Map<String, String>? formData,
     bool? isValid,
-    int? transactionIdSelected,
   }) {
     return TransactionBlocState(
       isInProgress: isInProgress ?? this.isInProgress,
@@ -36,8 +34,6 @@ class TransactionBlocState extends Equatable {
       transactions: transactions ?? this.transactions,
       formData: formData ?? this.formData,
       isValid: isValid ?? this.isValid,
-      transactionIdSelected:
-          transactionIdSelected ?? this.transactionIdSelected,
     );
   }
 
@@ -49,6 +45,5 @@ class TransactionBlocState extends Equatable {
         transactions,
         formData,
         isValid,
-        transactionIdSelected
       ];
 }

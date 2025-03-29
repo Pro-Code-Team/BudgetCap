@@ -14,7 +14,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TransactionScreen extends StatelessWidget {
-  TransactionScreen({super.key});
+  final Transaction? transaction;
+  TransactionScreen({super.key, this.transaction});
 
   final Operations view = Operations.income;
   final GlobalKey<FormState> _formKey =
@@ -31,7 +32,7 @@ class TransactionScreen extends StatelessWidget {
               if (_formKey.currentState?.validate() ?? false) {
                 // If the form is valid, dispatch the FormSubmitted event
                 context.read<TransactionBloc>().add(TransactionFormSubmitted(
-                      formData: state.formData,
+                      transactionId: transaction?.id,
                       context: context,
                     ));
                 context.pop();
@@ -53,27 +54,26 @@ class TransactionScreen extends StatelessWidget {
         title: const Text("Add Transaction"),
       ),
       body: TransactionView(
-          formKey: _formKey), // Pass the FormKey to TransactionView
+        formKey: _formKey,
+        transaction: transaction,
+      ), // Pass the FormKey to TransactionView
     );
   }
 }
 
 class TransactionView extends StatelessWidget {
+  final Transaction? transaction;
   final GlobalKey<FormState> formKey;
 
   const TransactionView({
     super.key,
-    required this.formKey, // Accept the FormKey
+    required this.formKey,
+    this.transaction, // Accept the FormKey
   });
 
   @override
   Widget build(BuildContext context) {
     //Looking for the transaction that came from the selected item on "All transaction list".
-    final transactionBlocState = context.read<TransactionBloc>().state;
-    final Transaction transaction = transactionBlocState.transactions
-        .firstWhere((element) =>
-            element.id == transactionBlocState.transactionIdSelected);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Column(
@@ -209,60 +209,78 @@ class TransactionInputFields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String amount = '';
+    String description = '';
+    //Validating amount and description and setting values in the state.
+    if (transaction != null) {
+      final TransactionBloc transactionBloc = context.read<TransactionBloc>();
+      amount = transaction!.amount.toString();
+      description = transaction!.description;
+
+      transactionBloc.add(
+          TransactionFormFieldChanged(fieldValue: amount, fieldName: 'Amount'));
+      transactionBloc.add(TransactionFormFieldChanged(
+          fieldValue: description, fieldName: 'Description'));
+    }
     return Form(
       key: formKey, // Assign the FormKey to the Form widget
-      child: Column(
-        children: [
-          Row(
+      child: BlocBuilder<TransactionBloc, TransactionBlocState>(
+        builder: (context, state) {
+          return Column(
             children: [
-              const Chip(label: Text("USD")),
-              const SizedBox(width: 10),
-              Flexible(
-                child: TextFormField(
-                  initialValue: transaction?.amount.toString() ?? '',
-                  onChanged: (value) {
-                    context.read<TransactionBloc>().add(
-                        TransactionFormFieldChanged(
-                            fieldValue: value, fieldName: 'Amount'));
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter an amount";
-                    }
-                    if (double.tryParse(value) == null) {
-                      return "Please enter a valid number";
-                    }
-                    return null;
-                  },
-                  textAlign: TextAlign.end,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Amount',
-                    hintText: 'Enter amount',
+              Row(
+                children: [
+                  const Chip(label: Text("USD")),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: TextFormField(
+                      initialValue: amount,
+                      onChanged: (value) {
+                        context.read<TransactionBloc>().add(
+                            TransactionFormFieldChanged(
+                                fieldValue: value, fieldName: 'Amount'));
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter an amount";
+                        }
+                        if (double.tryParse(value) == null) {
+                          return "Please enter a valid number";
+                        }
+                        return null;
+                      },
+                      textAlign: TextAlign.end,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Amount',
+                        hintText: 'Enter amount',
+                      ),
+                    ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                initialValue: description,
+                onChanged: (value) {
+                  context.read<TransactionBloc>().add(
+                      TransactionFormFieldChanged(
+                          fieldValue: value, fieldName: 'Description'));
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter a description";
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  hintText: 'Enter a description',
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 20),
-          TextFormField(
-            initialValue: transaction?.description ?? '',
-            onChanged: (value) {
-              context.read<TransactionBloc>().add(TransactionFormFieldChanged(
-                  fieldValue: value, fieldName: 'Description'));
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Please enter a description";
-              }
-              return null;
-            },
-            decoration: const InputDecoration(
-              labelText: 'Description',
-              hintText: 'Enter a description',
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

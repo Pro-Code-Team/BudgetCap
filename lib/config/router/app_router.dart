@@ -1,3 +1,4 @@
+import 'package:budgetcap/domain/entities/transaction.dart';
 import 'package:budgetcap/presentation/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -46,10 +47,14 @@ final appRouter = GoRouter(
                   const AllTransactionsScreen(),
               routes: <RouteBase>[
                 GoRoute(
-                  path: '/edit',
-                  builder: (BuildContext context, GoRouterState state) =>
-                      TransactionScreen(),
-                ),
+                    path: '/edit',
+                    builder: (BuildContext context, GoRouterState state) {
+                      final Transaction transaction =
+                          state.extra as Transaction;
+                      return TransactionScreen(
+                        transaction: transaction,
+                      );
+                    }),
                 GoRoute(
                   path: '/create',
                   builder: (BuildContext context, GoRouterState state) =>
