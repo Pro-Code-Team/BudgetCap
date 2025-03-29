@@ -18,8 +18,11 @@ class AllTransactionsScreen extends StatelessWidget {
     context.read<CategoryBloc>().add(const CategoryInitial());
 
     return Scaffold(
-      floatingActionButton:
-          FloatingActionButton(child: const Icon(Icons.add), onPressed: () {}),
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            context.push('/transactions/create');
+          }),
       body: SafeArea(
         child: BlocBuilder<TransactionBloc, TransactionBlocState>(
           builder: (context, state) {

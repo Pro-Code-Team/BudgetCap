@@ -122,6 +122,9 @@ class TransactionTypeSelection extends StatelessWidget {
       context.read<TransactionTypeBloc>().add(TransactionTypeChanged(
           selectedTransactionType:
               OperationsExtension.fromName(transaction!.type)));
+    } else {
+      context.read<TransactionTypeBloc>().add(const TransactionTypeChanged(
+          selectedTransactionType: Operations.expense));
     }
     return Center(
       child: BlocBuilder<TransactionTypeBloc, TransactionTypeState>(
@@ -167,6 +170,10 @@ class DatePickerSelection extends StatelessWidget {
       context
           .read<DatePickerBloc>()
           .add(DateChanged(selectedDate: transaction!.date));
+    } else {
+      context
+          .read<DatePickerBloc>()
+          .add(DateChanged(selectedDate: DateTime.now()));
     }
 
     return Center(
@@ -300,6 +307,10 @@ class AccountSelection extends StatelessWidget {
       context
           .read<AccountBloc>()
           .add(AccountSelected(accountSelected: transaction!.accountId));
+    } else {
+      context
+          .read<AccountBloc>()
+          .add(const AccountSelected(accountSelected: 1));
     }
 
     return Row(
@@ -362,6 +373,8 @@ class CategoriesView extends StatelessWidget {
       context
           .read<CategoryBloc>()
           .add(CategoryChanged(categorySelected: index));
+    } else {
+      context.read<CategoryBloc>().add(CategoryChanged(categorySelected: -1));
     }
     return Expanded(
       child: SingleChildScrollView(
