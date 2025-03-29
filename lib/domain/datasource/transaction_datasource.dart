@@ -7,5 +7,5 @@ abstract class TransactionDatasource {
   Future<List<Transaction>> getTransactionsByCategory(String categoryId);
   Future<List<Transaction>> getTransactionsByAccount(String accountId);
   Future<bool> updateTransaction(Transaction updatedTransaction);
-  Future<bool> deleteTransaction(String transactionId);
+  Future<bool> deleteTransaction(int transactionId);
 }

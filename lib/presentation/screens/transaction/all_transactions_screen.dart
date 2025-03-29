@@ -65,34 +65,52 @@ class AllTransactionsScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          GestureDetector(
-                            onTap: () {
-                              context.push('/transactions/edit',
-                                  extra: transaction);
+                          Dismissible(
+                            key: Key(transaction.id.toString()),
+                            onDismissed: (direction) {
+                              context.read<TransactionBloc>().add(
+                                  TransactionDelete(
+                                      transactionId: transaction.id!));
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        "${transaction.description} eliminado")),
+                              );
                             },
-                            child: Card(
-                              elevation: 4,
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 16),
-                              child: BlocBuilder<CategoryBloc, CategoryState>(
-                                builder: (context, categoryState) {
-                                  final category = categoryState.categories
-                                      .firstWhere(
-                                          (cat) =>
-                                              cat.id == transaction.categoryId,
-                                          orElse: () => Category(
-                                              id: 0,
-                                              name: 'Unknown',
-                                              icon: 'unknown',
-                                              description: 'Unknown'));
-                                  return ListTile(
-                                    leading:
-                                        IconGrabber(iconName: category.icon),
-                                    title: Text(category.name),
-                                    subtitle: Text(transaction.description),
-                                    trailing: Text("C\$ ${transaction.amount}"),
-                                  );
-                                },
+                            background: Container(color: Colors.red),
+                            direction: DismissDirection.endToStart,
+                            child: GestureDetector(
+                              onTap: () {
+                                context.push('/transactions/edit',
+                                    extra: transaction);
+                              },
+                              child: Card(
+                                elevation: 4,
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 16),
+                                child: BlocBuilder<CategoryBloc, CategoryState>(
+                                  builder: (context, categoryState) {
+                                    final category = categoryState.categories
+                                        .firstWhere(
+                                            (cat) =>
+                                                cat.id ==
+                                                transaction.categoryId,
+                                            orElse: () => Category(
+                                                id: 0,
+                                                name: 'Unknown',
+                                                icon: 'unknown',
+                                                description: 'Unknown'));
+                                    return ListTile(
+                                      leading:
+                                          IconGrabber(iconName: category.icon),
+                                      title: Text(category.name),
+                                      subtitle: Text(transaction.description),
+                                      trailing:
+                                          Text("C\$ ${transaction.amount}"),
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),

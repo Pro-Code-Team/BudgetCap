@@ -12,9 +12,13 @@ class TransactionDatasourceImpl extends TransactionDatasource {
       : _supabase = supabase;
 
   @override
-  Future<bool> deleteTransaction(String transactionId) async {
-    // TODO: implement deleteTransaction
-    throw UnimplementedError();
+  Future<bool> deleteTransaction(int transactionId) async {
+    try {
+      await _supabase.from(_tableName).delete().eq('id', transactionId);
+      return true;
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 
   @override

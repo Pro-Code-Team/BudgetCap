@@ -23,6 +23,7 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     on<TransactionFormFieldChanged>(_onTransactionFormFieldChanged);
     on<TransactionFormSubmitted>(_onTransactionFormSubmitted);
     on<TransactionFetchedById>(_onTransactionFetchedById);
+    on<TransactionDelete>(_onTransactionDelete);
   }
 
   Future<void> _onTransactionCreated(
@@ -123,4 +124,21 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
 
   Future<void> _onTransactionFetchedById(
       TransactionFetchedById event, Emitter<TransactionBlocState> emit) async {}
+
+  Future<void> _onTransactionDelete(
+      TransactionDelete event, Emitter<TransactionBlocState> emit) async {
+    emit(state.copyWith(isInProgress: true));
+
+    try {
+      await _repository.deleteTransaction(event.transactionId);
+      final newTransactions = state.transactions;
+
+      newTransactions
+          .removeWhere((transaction) => transaction.id == event.transactionId);
+
+      emit(state.copyWith(transactions: newTransactions, isInProgress: false));
+    } catch (e) {
+      emit(state.copyWith(isInProgress: false, message: e.toString()));
+    }
+  }
 }

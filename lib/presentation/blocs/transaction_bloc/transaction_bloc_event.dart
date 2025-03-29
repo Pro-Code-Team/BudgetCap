@@ -38,3 +38,9 @@ class TransactionFetchedById extends TransactionBlocEvent {
 
   TransactionFetchedById({required this.transactionToBeFetched});
 }
+
+class TransactionDelete extends TransactionBlocEvent {
+  final int transactionId;
+
+  TransactionDelete({required this.transactionId});
+}

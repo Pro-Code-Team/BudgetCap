@@ -10,7 +10,7 @@ class TransactionRepositoryImpl extends TransactionRepository {
       : _transactionDatasource = transactionDatasource;
 
   @override
-  Future<bool> deleteTransaction(String transactionId) async {
+  Future<bool> deleteTransaction(int transactionId) async {
     return await _transactionDatasource.deleteTransaction(transactionId);
   }
 
