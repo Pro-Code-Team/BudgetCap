@@ -3,6 +3,7 @@ class AccountModel {
   final String name;
   final String description;
   final String currency;
+  final double balance;
   final String icon;
   final String color;
 
@@ -11,6 +12,7 @@ class AccountModel {
     required this.name,
     required this.description,
     required this.currency,
+    required this.balance,
     required this.icon,
     required this.color,
   });
@@ -21,6 +23,9 @@ class AccountModel {
       name: map['name'],
       description: map['description'],
       currency: map['currency'],
+      balance: (map['balance'] is int)
+          ? (map['balance'] as int).toDouble()
+          : (map['balance'] as double),
       icon: map['icon'],
       color: map['color'],
     );
@@ -31,6 +36,7 @@ class AccountModel {
       'name': name,
       'description': description,
       'currency': currency,
+      'balance': balance,
       'icon': icon,
       'color': color,
     };

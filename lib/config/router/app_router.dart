@@ -1,4 +1,5 @@
 import 'package:budgetcap/domain/entities/transaction.dart';
+import 'package:budgetcap/presentation/screens/reports/reports_screen.dart';
 import 'package:budgetcap/presentation/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,7 @@ final appRouter = GoRouter(
               // bottom navigation bar.
               path: '/',
               builder: (BuildContext context, GoRouterState state) =>
-                  const DetailsScreen(),
+                  ReportsScreen(),
               // routes: <RouteBase>[
               //   // The details screen to display stacked on navigator of the
               //   // first tab. This will cover screen A but not the application

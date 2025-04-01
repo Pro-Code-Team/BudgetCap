@@ -8,6 +8,7 @@ class AccountMapper {
       name: entity.name,
       description: entity.description,
       currency: entity.currency,
+      balance: entity.balance,
       icon: entity.icon,
       color: entity.color,
     );
@@ -19,6 +20,7 @@ class AccountMapper {
       name: model.name,
       description: model.description,
       currency: model.currency,
+      balance: model.balance,
       icon: model.icon,
       color: model.color,
     );

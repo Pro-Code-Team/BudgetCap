@@ -143,7 +143,8 @@ class AllTransactionsScreen extends StatelessWidget {
                                       leading:
                                           IconGrabber(iconName: category.icon),
                                       title: Text(category.name),
-                                      subtitle: Text(transaction.description),
+                                      subtitle: Text(
+                                          '${transaction.description}\nAccount: ${transaction.accountId}'),
                                       trailing:
                                           Text("C\$ ${transaction.amount}"),
                                     );

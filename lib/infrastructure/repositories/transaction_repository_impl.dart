@@ -35,7 +35,7 @@ class TransactionRepositoryImpl extends TransactionRepository {
   }
 
   @override
-  Future<String> recordTransaction(Transaction transaction) async {
+  Future<int> recordTransaction(Transaction transaction) async {
     return await _transactionDatasource.recordTransaction(transaction);
   }
 

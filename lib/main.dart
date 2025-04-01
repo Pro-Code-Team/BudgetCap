@@ -9,6 +9,7 @@ import 'package:budgetcap/infrastructure/repositories/transaction_repository_imp
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
+import 'package:budgetcap/presentation/blocs/reports_bloc/reports_bloc.dart';
 
 import 'package:budgetcap/presentation/blocs/transaction_type_bloc/transaction_type_bloc.dart';
 import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart';
@@ -66,6 +67,7 @@ Future main() async {
     BlocProvider<TransactionBloc>(
       create: (_) => TransactionBloc(transactionRepository),
     ),
+    BlocProvider<ReportsBloc>(create: (_) => ReportsBloc()),
   ], child: const MyApp()));
 }
 

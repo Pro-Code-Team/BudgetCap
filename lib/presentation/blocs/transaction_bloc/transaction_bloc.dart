@@ -30,27 +30,46 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
       TransactionCreated event, Emitter<TransactionBlocState> emit) async {
     emit(state.copyWith(isInProgress: true));
     final bool isEditMode = event.transaction.id != null;
+    Transaction transaction = event.transaction;
 
     try {
       if (isEditMode) {
-        await _repository.updateTransaction(event.transaction);
-        final newTransactions = state.transactions;
-        //Finding index of the updated transaction.
-        newTransactions[newTransactions.indexWhere(
-                (transaction) => transaction.id == event.transaction.id)] =
-            event.transaction;
-
-        emit(state.copyWith(isInProgress: false));
+        await _repository.updateTransaction(transaction);
       } else {
-        await _repository.recordTransaction(event.transaction);
-        final newTransactions = state.transactions;
-        newTransactions.add(event.transaction);
-        emit(
-            state.copyWith(transactions: newTransactions, isInProgress: false));
+        final int id = await _repository.recordTransaction(transaction);
+        transaction = transaction.copyWith(id: id);
       }
+
+      final updatedTransactions = _updateTransactionList(
+        state.transactions,
+        transaction,
+        isEditMode,
+      );
+
+      emit(state.copyWith(
+        transactions: updatedTransactions,
+        isInProgress: false,
+      ));
     } catch (e) {
-      emit(state.copyWith(isInProgress: false, message: e.toString()));
+      emit(state.copyWith(
+        isInProgress: false,
+        message: 'An unexpected error occurred: ${e.toString()}',
+      ));
     }
+  }
+
+  List<Transaction> _updateTransactionList(List<Transaction> transactions,
+      Transaction transaction, bool isEditMode) {
+    final updatedList = List<Transaction>.from(transactions);
+    if (isEditMode) {
+      final index = updatedList.indexWhere((t) => t.id == transaction.id);
+      if (index != -1) {
+        updatedList[index] = transaction;
+      }
+    } else {
+      updatedList.add(transaction);
+    }
+    return updatedList;
   }
 
   Future<void> _onTransactionFetchAll(
@@ -61,7 +80,10 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
           state.copyWith(transactions: await _repository.getAllTransactions()));
       emit(state.copyWith(isInProgress: false));
     } catch (e) {
-      emit(state.copyWith(isInProgress: false, message: e.toString()));
+      emit(state.copyWith(
+        isInProgress: false,
+        message: 'An unexpected error occurred: ${e.toString()}',
+      ));
     }
   }
 
@@ -76,50 +98,45 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
 
   Future<void> _onTransactionFormSubmitted(TransactionFormSubmitted event,
       Emitter<TransactionBlocState> emit) async {
+    final formData = state.formData;
+
+    // Validar campos requeridos
+    if (formData['Amount'] == null || formData['Amount']!.isEmpty) {
+      emit(state.copyWith(isValid: false, message: 'Amount is required'));
+      return;
+    }
+
+    if (double.tryParse(formData['Amount']!) == null) {
+      emit(state.copyWith(
+          isValid: false, message: 'Amount must be a valid number'));
+      return;
+    }
+
+    emit(state.copyWith(isValid: true, message: ''));
+
+    // Crear objeto Transaction
+    final transaction = _createTransactionFromForm(event);
+
+    // Emitir evento para crear o actualizar la transacción
+    add(TransactionCreated(transaction));
+  }
+
+  Transaction _createTransactionFromForm(TransactionFormSubmitted event) {
     final recordTypeBloc = event.context.read<TransactionTypeBloc>().state;
     final dateBloc = event.context.read<DatePickerBloc>().state;
     final accountBloc = event.context.read<AccountBloc>().state;
     final categoryBloc = event.context.read<CategoryBloc>().state;
     final formData = state.formData;
 
-    if (formData['Amount'] == null || formData['Amount']!.isEmpty) {
-      emit(state.copyWith(isValid: false, message: 'Amount is required'));
-    } else {
-      emit(state.copyWith(isValid: true, message: ''));
-
-      final int? transactionId = event.transactionId;
-      final id = transactionId;
-      final accountId = accountBloc.accountSelected;
-      final type = recordTypeBloc.selectedValue.name;
-      final amount = double.parse(formData['Amount']!);
-      final categoryId =
-          categoryBloc.categories[categoryBloc.categorySelected].id!;
-      final date = dateBloc.selectedDate;
-      final description = formData['Description'] ?? '';
-
-      add(
-        TransactionCreated(
-          transactionId != null
-              ? Transaction(
-                  id: id,
-                  accountId: accountId,
-                  type: type,
-                  amount: amount,
-                  categoryId: categoryId,
-                  date: date,
-                  description: description,
-                )
-              : Transaction(
-                  accountId: accountId,
-                  type: type,
-                  amount: amount,
-                  categoryId: categoryId,
-                  date: date,
-                  description: description,
-                ),
-        ),
-      );
-    }
+    return Transaction(
+      id: event.transactionId,
+      accountId: accountBloc.accountSelected,
+      type: recordTypeBloc.selectedValue.name,
+      amount: double.parse(formData['Amount']!),
+      categoryId: categoryBloc.categories[categoryBloc.categorySelected].id!,
+      date: dateBloc.selectedDate,
+      description: formData['Description'] ?? '',
+    );
   }
 
   Future<void> _onTransactionFetchedById(
@@ -138,7 +155,10 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
 
       emit(state.copyWith(transactions: newTransactions, isInProgress: false));
     } catch (e) {
-      emit(state.copyWith(isInProgress: false, message: e.toString()));
+      emit(state.copyWith(
+        isInProgress: false,
+        message: 'An unexpected error occurred: ${e.toString()}',
+      ));
     }
   }
 }

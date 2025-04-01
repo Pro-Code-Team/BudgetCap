@@ -182,8 +182,8 @@ class NewAccountScreen extends StatelessWidget {
                             child: Container(
                               decoration: BoxDecoration(
                                 color: selectedIcon == iconName
-                                    ? Colors.blue.withOpacity(0.5)
-                                    : Colors.grey.withOpacity(0.2),
+                                    ? Colors.blue.withValues(blue: 0.5)
+                                    : Colors.grey.withValues(blue: 0.2),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: selectedIcon == iconName

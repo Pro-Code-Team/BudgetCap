@@ -67,6 +67,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           name: formData['name']!,
           description: formData['description']!,
           currency: formData['currency']!,
+          balance: double.tryParse(formData['balance']!) ?? 0.0,
           icon: formData['icon']!,
           color: formData['color']!,
         ),

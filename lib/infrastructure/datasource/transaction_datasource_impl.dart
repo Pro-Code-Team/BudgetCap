@@ -56,13 +56,13 @@ class TransactionDatasourceImpl extends TransactionDatasource {
   }
 
   @override
-  Future<String> recordTransaction(Transaction transaction) async {
+  Future<int> recordTransaction(Transaction transaction) async {
     try {
       final transactionSupabase =
           TransactionMapper.toModel(transaction).toMap();
-      final data =
+      final response =
           await _supabase.from(_tableName).insert(transactionSupabase).select();
-      return data.first['id'].toString();
+      return response.first['id'];
     } catch (e) {
       throw Exception(e);
     }

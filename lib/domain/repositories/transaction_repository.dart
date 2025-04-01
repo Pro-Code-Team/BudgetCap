@@ -2,7 +2,7 @@ import 'package:budgetcap/domain/entities/transaction.dart';
 
 abstract class TransactionRepository {
   Future<List<Transaction>> getAllTransactions();
-  Future<String> recordTransaction(Transaction transaction);
+  Future<int> recordTransaction(Transaction transaction);
   Future<List<Transaction>> getTransactionsById(String userId);
   Future<List<Transaction>> getTransactionsByCategory(String categoryId);
   Future<List<Transaction>> getTransactionsByAccount(String accountId);
