@@ -1,7 +1,10 @@
+import 'package:budgetcap/config/constants/constants.dart';
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/reports_bloc/reports_bloc.dart';
+import 'package:budgetcap/presentation/widgets/icon_grabber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class ReportsScreen extends StatelessWidget {
   ReportsScreen({super.key});
@@ -47,37 +50,40 @@ class ReportsScreen extends StatelessWidget {
                           },
                           itemBuilder: (context, index) {
                             final account = state.accounts[index];
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 40),
-                              child: Card(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 20),
-                                child: Container(
-                                  width: 300,
-                                  padding: const EdgeInsets.all(16),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        account.name,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                            return InkWell(
+                              onTap: () {
+                                //Redirect to see all the transactions with this accountID in them.
+                                context.push('/accounts/transactions',
+                                    extra: account.id);
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 40),
+                                child: Card(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 20),
+                                  child: Container(
+                                    width: 300,
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        IconGrabber(iconName: account.icon),
+                                        Text(
+                                          account.name,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      const Text(
-                                        'Total Spent:',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      const Text(
-                                        'Transactions: ',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ],
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          '${account.balance.round()} USD',
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

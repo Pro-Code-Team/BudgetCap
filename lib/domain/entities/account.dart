@@ -17,27 +17,23 @@ class Account {
     required this.color,
   });
 
-  factory Account.fromMap(Map<String, dynamic> map) {
+  Account copyWith({
+    int? id,
+    String? name,
+    String? description,
+    String? currency,
+    double? balance,
+    String? icon,
+    String? color,
+  }) {
     return Account(
-      id: map['id'],
-      name: map['name'],
-      description: map['description'],
-      currency: map['currency'],
-      icon: map['icon'],
-      balance: map['balance'],
-      color: map['color'],
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      currency: currency ?? this.currency,
+      balance: balance ?? this.balance,
+      icon: icon ?? this.icon,
+      color: color ?? this.color,
     );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'currency': currency,
-      'icon': icon,
-      'balance': balance,
-      'color': color,
-    };
   }
 }

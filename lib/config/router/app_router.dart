@@ -68,10 +68,18 @@ final appRouter = GoRouter(
         StatefulShellBranch(
           routes: <RouteBase>[
             GoRoute(
-              path: '/accounts',
-              builder: (BuildContext context, GoRouterState state) =>
-                  const AllAccountsScreen(),
-            ),
+                path: '/accounts',
+                builder: (BuildContext context, GoRouterState state) =>
+                    const AllAccountsScreen(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: '/transactions',
+                    builder: (context, state) {
+                      final int accountId = state.extra as int;
+                      return AllTransactionsScreen(accountId: accountId);
+                    },
+                  ),
+                ]),
           ],
         ),
       ],

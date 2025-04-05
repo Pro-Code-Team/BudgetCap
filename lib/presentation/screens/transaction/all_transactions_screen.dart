@@ -1,5 +1,6 @@
 import 'package:budgetcap/domain/entities/category.dart';
 import 'package:budgetcap/domain/entities/transaction.dart';
+import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
 import 'package:budgetcap/presentation/blocs/transaction_bloc/transaction_bloc.dart';
 import 'package:budgetcap/presentation/widgets/icon_grabber.dart';
@@ -10,7 +11,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class AllTransactionsScreen extends StatelessWidget {
-  const AllTransactionsScreen({super.key});
+  final int? accountId;
+  const AllTransactionsScreen({super.key, this.accountId});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +21,11 @@ class AllTransactionsScreen extends StatelessWidget {
     context.read<CategoryBloc>().add(const CategoryInitial());
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(accountId == null
+            ? 'Transactions'
+            : '${context.read<AccountBloc>().state.accounts.firstWhere((account) => account.id == accountId).name} '),
+      ),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
@@ -34,9 +41,18 @@ class AllTransactionsScreen extends StatelessWidget {
             if (state.message.isNotEmpty) {
               return Center(child: Text(state.message));
             }
+            //Guardando transaction del estado e una variable.
+            final List<Transaction> transactions =
+                List<Transaction>.from(state.transactions);
+            //Checking if the accountID is null
+            if (accountId != null) {
+              //Filter transactions by Id
+              transactions.retainWhere(
+                  (transaction) => transaction.accountId == accountId);
+            }
             // Group transactions by date
             final transactionsByDate = <String, List<Transaction>>{};
-            for (var transaction in state.transactions) {
+            for (Transaction transaction in transactions) {
               final date = DateFormat('dd-MM-yyyy').format(transaction.date);
               if (!transactionsByDate.containsKey(date)) {
                 transactionsByDate[date] = [];

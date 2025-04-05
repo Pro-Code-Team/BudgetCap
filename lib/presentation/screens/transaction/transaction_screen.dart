@@ -237,7 +237,14 @@ class TransactionInputFields extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Chip(label: Text("USD")),
+                  Chip(
+                    label: BlocBuilder<AccountBloc, AccountState>(
+                      builder: (context, state) {
+                        return Text(
+                            state.accounts[state.accountSelected].currency);
+                      },
+                    ),
+                  ),
                   const SizedBox(width: 10),
                   Flexible(
                     child: TextFormField(
