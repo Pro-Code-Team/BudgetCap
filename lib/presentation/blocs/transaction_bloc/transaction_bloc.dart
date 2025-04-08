@@ -115,6 +115,7 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     emit(state.copyWith(isValid: true, message: ''));
 
     // Crear objeto Transaction
+    //TODO: Completar logica para crear la tramsfer.
     final Transaction transaction = _createTransactionFromForm(event);
 
     // Emitir evento para crear o actualizar la transacción
