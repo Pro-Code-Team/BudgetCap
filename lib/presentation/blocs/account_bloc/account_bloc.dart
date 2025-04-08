@@ -15,11 +15,19 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     on<RecordAccount>(_onRecordAccount);
     on<FormFieldChanged>(_onFormFieldChanged);
     on<FormSubmitted>(_onFormSubmitted);
+    on<AccountToBeTransferredSelected>(_onAccountToBeTransferredSelected);
+
     add(const AccountInitial());
   }
 
   void _onAccountSelected(AccountSelected event, Emitter<AccountState> emit) {
     emit(state.copyWith(accountSelected: event.accountSelected));
+  }
+
+  void _onAccountToBeTransferredSelected(
+      AccountToBeTransferredSelected event, Emitter<AccountState> emit) {
+    emit(state.copyWith(
+        accountToBeTransferred: event.accountToBeTransferredSelected));
   }
 
   Future<void> _onRecordAccount(
@@ -75,11 +83,14 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
       // Emit success state if the response is valid
       if (response.isNotEmpty) {
-        emit(state.copyWith(
-          isInProgress: false,
-          isSuccess: true,
-          message: 'The account has been created successfully!',
-        ));
+        emit(
+          state.copyWith(
+            isInProgress: false,
+            isSuccess: true,
+            message: 'The account has been created successfully!',
+            accounts: await _accountRepo.getAllAccounts(),
+          ),
+        );
       } else {
         // Emit failure state if the response is empty
         emit(state.copyWith(

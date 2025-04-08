@@ -14,6 +14,13 @@ class AccountSelected extends AccountEvent {
   const AccountSelected({required this.accountSelected});
 }
 
+class AccountToBeTransferredSelected extends AccountEvent {
+  final int accountToBeTransferredSelected;
+
+  AccountToBeTransferredSelected(
+      {required this.accountToBeTransferredSelected});
+}
+
 class RecordAccount extends AccountEvent {
   final Account account;
 

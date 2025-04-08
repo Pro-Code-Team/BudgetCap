@@ -35,6 +35,10 @@ class TransactionScreen extends StatelessWidget {
                       transactionId: transaction?.id,
                       context: context,
                     ));
+                //Will retrieve the balances for all account from the database whenever a transaction is created, updated or deleted.
+                context.read<AccountBloc>().add(
+                      const AccountInitial(),
+                    );
                 context.pop();
               } else {
                 // Show an error if the form is invalid
@@ -96,11 +100,32 @@ class TransactionView extends StatelessWidget {
               AccountSelection(
                 transaction: transaction,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
+              BlocBuilder<TransactionTypeBloc, TransactionTypeState>(
+                builder: (context, state) {
+                  if (state.selectedValue == Operations.transfer) {
+                    return AccountToBeTransferredSelection(
+                      transaction: transaction,
+                    );
+                  }
+                  return const SizedBox(
+                    height: 0,
+                  );
+                },
+              ),
             ],
           ),
-          CategoriesView(
-            transaction: transaction,
+          BlocBuilder<TransactionTypeBloc, TransactionTypeState>(
+            builder: (context, state) {
+              if (state.selectedValue != Operations.transfer) {
+                return CategoriesView(
+                  transaction: transaction,
+                );
+              }
+              return const SizedBox(
+                height: 0,
+              );
+            },
           ),
         ],
       ),
@@ -240,8 +265,11 @@ class TransactionInputFields extends StatelessWidget {
                   Chip(
                     label: BlocBuilder<AccountBloc, AccountState>(
                       builder: (context, state) {
-                        return Text(
-                            state.accounts[state.accountSelected].currency);
+                        return Text(state.accounts
+                            .where((account) =>
+                                account.id == state.accountSelected)
+                            .first
+                            .currency);
                       },
                     ),
                   ),
@@ -350,6 +378,64 @@ class AccountSelection extends StatelessWidget {
                   context
                       .read<AccountBloc>()
                       .add(AccountSelected(accountSelected: newValue));
+                }
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class AccountToBeTransferredSelection extends StatelessWidget {
+  final Transaction? transaction;
+  const AccountToBeTransferredSelection({
+    super.key,
+    this.transaction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+//Validator
+    if (transaction != null) {
+      context.read<AccountBloc>().add(AccountToBeTransferredSelected(
+          accountToBeTransferredSelected: transaction!.accountId));
+    } else {
+      context.read<AccountBloc>().add(
+          AccountToBeTransferredSelected(accountToBeTransferredSelected: 1));
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const SizedBox(
+            child: Row(
+          children: [
+            Icon(Icons.wallet),
+            SizedBox(
+              width: 10,
+            ),
+            Text('Destination Account'),
+          ],
+        )),
+        BlocBuilder<AccountBloc, AccountState>(
+          builder: (context, state) {
+            return DropdownButton<int>(
+              value: state.accountToBeTransferred,
+              items: state.accounts.map<DropdownMenuItem<int>>((Account value) {
+                return DropdownMenuItem<int>(
+                  value: value.id,
+                  child: Text(
+                    value.name,
+                  ),
+                );
+              }).toList(),
+              onChanged: (int? newValue) {
+                if (newValue != null) {
+                  context.read<AccountBloc>().add(
+                      AccountToBeTransferredSelected(
+                          accountToBeTransferredSelected: newValue));
                 }
               },
             );

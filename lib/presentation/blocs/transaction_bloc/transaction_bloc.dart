@@ -115,7 +115,7 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     emit(state.copyWith(isValid: true, message: ''));
 
     // Crear objeto Transaction
-    final transaction = _createTransactionFromForm(event);
+    final Transaction transaction = _createTransactionFromForm(event);
 
     // Emitir evento para crear o actualizar la transacción
     add(TransactionCreated(transaction));
@@ -127,12 +127,15 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     final accountBloc = event.context.read<AccountBloc>().state;
     final categoryBloc = event.context.read<CategoryBloc>().state;
     final formData = state.formData;
+    final typeValidator = recordTypeBloc.selectedValue.name;
 
     return Transaction(
       id: event.transactionId,
       accountId: accountBloc.accountSelected,
       type: recordTypeBloc.selectedValue.name,
-      amount: double.parse(formData['Amount']!),
+      amount: typeValidator == "expense"
+          ? -double.parse(formData['Amount']!)
+          : double.parse(formData['Amount']!),
       categoryId: categoryBloc.categories[categoryBloc.categorySelected].id!,
       date: dateBloc.selectedDate,
       description: formData['Description'] ?? '',
