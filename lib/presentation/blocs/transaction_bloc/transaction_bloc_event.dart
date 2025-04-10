@@ -18,7 +18,7 @@ class TransactionCreated extends TransactionBlocEvent {
 
 class TransactionFormFieldChanged extends TransactionBlocEvent {
   final String fieldName;
-  final String fieldValue;
+  final dynamic fieldValue;
 
   const TransactionFormFieldChanged({
     required this.fieldName,
@@ -28,9 +28,8 @@ class TransactionFormFieldChanged extends TransactionBlocEvent {
 
 class TransactionFormSubmitted extends TransactionBlocEvent {
   final int? transactionId;
-  final BuildContext context;
 
-  TransactionFormSubmitted({this.transactionId, required this.context});
+  TransactionFormSubmitted({this.transactionId});
 }
 
 class TransactionFetchedById extends TransactionBlocEvent {

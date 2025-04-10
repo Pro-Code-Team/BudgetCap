@@ -2,11 +2,7 @@ import 'dart:async';
 
 import 'package:budgetcap/domain/entities/transaction.dart';
 import 'package:budgetcap/infrastructure/repositories/transaction_repository_impl.dart';
-import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
-import 'package:budgetcap/presentation/blocs/category_bloc/category_bloc.dart';
-import 'package:budgetcap/presentation/blocs/date_bloc/date_picker_bloc.dart';
-import 'package:budgetcap/presentation/blocs/transaction_type_bloc/transaction_type_bloc.dart';
-import 'package:flutter/material.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:equatable/equatable.dart';
@@ -90,56 +86,67 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
 //FORM EVENTS
   void _onTransactionFormFieldChanged(
       TransactionFormFieldChanged event, Emitter<TransactionBlocState> emit) {
-    final Map<String, String> newFormData =
-        Map<String, String>.from(state.formData);
+    final Map<String, dynamic> newFormData =
+        Map<String, dynamic>.from(state.formData);
     newFormData[event.fieldName] = event.fieldValue;
     emit(state.copyWith(formData: newFormData));
   }
 
   Future<void> _onTransactionFormSubmitted(TransactionFormSubmitted event,
       Emitter<TransactionBlocState> emit) async {
-    final formData = state.formData;
+    //Copy of form data to add a new field to the formData
+    final Map<String, dynamic> formData =
+        Map<String, dynamic>.from(state.formData);
 
     // Validar campos requeridos
-    if (formData['Amount'] == null || formData['Amount']!.isEmpty) {
+    if (formData['amount'] == null || formData['amount']!.isEmpty) {
       emit(state.copyWith(isValid: false, message: 'Amount is required'));
       return;
     }
 
-    if (double.tryParse(formData['Amount']!) == null) {
+    if (double.tryParse(formData['amount']!) == null) {
       emit(state.copyWith(
           isValid: false, message: 'Amount must be a valid number'));
       return;
     }
 
     emit(state.copyWith(isValid: true, message: ''));
+    formData['id'] = event.transactionId;
 
-    // Crear objeto Transaction
-    //TODO: Completar logica para crear la tramsfer.
-    final Transaction transaction = _createTransactionFromForm(event);
+    if (formData['transaction_type'] != "income") {
+      //Converting amount to negative
+      formData['amount'] = double.parse(formData['amount']!) * -1;
+    }
+
+    // Do this if INCOME or EXPENSE
+    final Transaction transaction = _createTransactionFromForm(formData);
 
     // Emitir evento para crear o actualizar la transacción
     add(TransactionCreated(transaction));
+
+    // Do this if TRANSFER - Taking care of the second transaction
+    if (formData['transaction_type'] == "transfer") {
+      //Converting amount to positive
+      formData['amount'] = formData['amount'] * -1;
+      formData['account_id'] = formData['account_id_destination'];
+
+      // Crear objeto Transaction
+      final Transaction transaction = _createTransactionFromForm(formData);
+      // Emitir evento para crear o actualizar la transacción
+      add(TransactionCreated(transaction));
+    }
   }
 
-  Transaction _createTransactionFromForm(TransactionFormSubmitted event) {
-    final recordTypeBloc = event.context.read<TransactionTypeBloc>().state;
-    final dateBloc = event.context.read<DatePickerBloc>().state;
-    final accountBloc = event.context.read<AccountBloc>().state;
-    final categoryBloc = event.context.read<CategoryBloc>().state;
-    final formData = state.formData;
-    final typeValidator = recordTypeBloc.selectedValue.name;
-
+//Separated function
+  Transaction _createTransactionFromForm(Map<String, dynamic> formData) {
     return Transaction(
-      id: event.transactionId,
-      accountId: accountBloc.accountSelected,
-      type: recordTypeBloc.selectedValue.name,
-      amount: typeValidator == "expense"
-          ? -double.parse(formData['Amount']!)
-          : double.parse(formData['Amount']!),
-      categoryId: categoryBloc.categories[categoryBloc.categorySelected].id!,
-      date: dateBloc.selectedDate,
-      description: formData['Description'] ?? '',
+      id: formData['id'],
+      accountId: formData['account_id'],
+      type: formData['transaction_type'],
+      amount: formData['amount'],
+      categoryId: formData['category_id'] ?? 1,
+      date: formData['date'] ?? DateTime.now(),
+      description: formData['description'] ?? '',
     );
   }
 

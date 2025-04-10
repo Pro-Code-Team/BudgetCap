@@ -31,10 +31,8 @@ class TransactionScreen extends StatelessWidget {
               // Trigger form validation
               if (_formKey.currentState?.validate() ?? false) {
                 // If the form is valid, dispatch the FormSubmitted event
-                context.read<TransactionBloc>().add(TransactionFormSubmitted(
-                      transactionId: transaction?.id,
-                      context: context,
-                    ));
+                context.read<TransactionBloc>().add(
+                    TransactionFormSubmitted(transactionId: transaction?.id));
                 //Will retrieve the balances for all account from the database whenever a transaction is created, updated or deleted.
                 context.read<AccountBloc>().add(
                       const AccountInitial(),
@@ -173,6 +171,9 @@ class TransactionTypeSelection extends StatelessWidget {
             onSelectionChanged: (selected) {
               context.read<TransactionTypeBloc>().add(TransactionTypeChanged(
                   selectedTransactionType: selected.first));
+              context.read<TransactionBloc>().add(TransactionFormFieldChanged(
+                  fieldName: 'transaction_type',
+                  fieldValue: selected.first.name));
             },
           );
         },
@@ -215,6 +216,8 @@ class DatePickerSelection extends StatelessWidget {
                 context
                     .read<DatePickerBloc>()
                     .add(DateChanged(selectedDate: pickedDate));
+                context.read<TransactionBloc>().add(TransactionFormFieldChanged(
+                    fieldName: 'date', fieldValue: pickedDate));
               }
             },
             child: Chip(
@@ -250,9 +253,9 @@ class TransactionInputFields extends StatelessWidget {
       description = transaction!.description;
 
       transactionBloc.add(
-          TransactionFormFieldChanged(fieldValue: amount, fieldName: 'Amount'));
+          TransactionFormFieldChanged(fieldValue: amount, fieldName: 'amount'));
       transactionBloc.add(TransactionFormFieldChanged(
-          fieldValue: description, fieldName: 'Description'));
+          fieldValue: description, fieldName: 'description'));
     }
     return Form(
       key: formKey, // Assign the FormKey to the Form widget
@@ -280,7 +283,7 @@ class TransactionInputFields extends StatelessWidget {
                       onChanged: (value) {
                         context.read<TransactionBloc>().add(
                             TransactionFormFieldChanged(
-                                fieldValue: value, fieldName: 'Amount'));
+                                fieldValue: value, fieldName: 'amount'));
                       },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -307,7 +310,7 @@ class TransactionInputFields extends StatelessWidget {
                 onChanged: (value) {
                   context.read<TransactionBloc>().add(
                       TransactionFormFieldChanged(
-                          fieldValue: value, fieldName: 'Description'));
+                          fieldValue: value, fieldName: 'description'));
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -378,6 +381,9 @@ class AccountSelection extends StatelessWidget {
                   context
                       .read<AccountBloc>()
                       .add(AccountSelected(accountSelected: newValue));
+                  context.read<TransactionBloc>().add(
+                      TransactionFormFieldChanged(
+                          fieldName: 'account_id', fieldValue: newValue));
                 }
               },
             );
@@ -436,6 +442,10 @@ class AccountToBeTransferredSelection extends StatelessWidget {
                   context.read<AccountBloc>().add(
                       AccountToBeTransferredSelected(
                           accountToBeTransferredSelected: newValue));
+                  context.read<TransactionBloc>().add(
+                      TransactionFormFieldChanged(
+                          fieldName: 'account_id_destination',
+                          fieldValue: newValue));
                 }
               },
             );
@@ -502,6 +512,9 @@ class CategoriesView extends StatelessWidget {
                     context
                         .read<CategoryBloc>()
                         .add(CategoryChanged(categorySelected: index));
+                    context.read<TransactionBloc>().add(
+                        TransactionFormFieldChanged(
+                            fieldName: 'category_id', fieldValue: category.id));
                   },
                   child: Container(
                     decoration: BoxDecoration(

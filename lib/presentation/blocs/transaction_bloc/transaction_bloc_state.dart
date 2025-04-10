@@ -6,7 +6,7 @@ class TransactionBlocState extends Equatable {
   final String message;
   final String errorMessage;
   final List<Transaction> transactions;
-  final Map<String, String> formData;
+  final Map<String, dynamic> formData;
   final bool isValid;
 
 //We initialize the parameter when loading the widget for the first time.
@@ -24,7 +24,7 @@ class TransactionBlocState extends Equatable {
     String? message,
     String? errorMessage,
     List<Transaction>? transactions,
-    Map<String, String>? formData,
+    Map<String, dynamic>? formData,
     bool? isValid,
   }) {
     return TransactionBlocState(
