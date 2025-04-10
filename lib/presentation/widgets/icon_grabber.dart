@@ -11,7 +11,7 @@ class IconGrabber extends StatelessWidget {
   }
 
   IconData _getIconData(String iconName) {
-    final iconData = _iconMap[iconName];
+    final IconData? iconData = _iconMap[iconName];
     return iconData ?? Icons.help; // Default icon if no match is found
   }
 
@@ -66,6 +66,7 @@ class IconGrabber extends StatelessWidget {
     'money_transfer': Icons.swap_horiz,
     'receipt': Icons.receipt,
     'check': Icons.check_circle,
+    'swap_horiz': Icons.swap_horiz,
     // Add more icons as needed
   };
 }

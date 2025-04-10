@@ -340,16 +340,20 @@ class AccountSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-//Validator
-    if (transaction != null) {
-      context
-          .read<AccountBloc>()
-          .add(AccountSelected(accountSelected: transaction!.accountId));
-    } else {
-      context
-          .read<AccountBloc>()
-          .add(const AccountSelected(accountSelected: 1));
+    int accountId = transaction?.accountId ?? 1;
+
+    if (transaction?.type == "income") {
+      accountId = context.watch<TransactionTypeBloc>().state.selectedValue ==
+              Operations.transfer
+          ? 1
+          : transaction!.accountId;
     }
+
+    context
+        .read<AccountBloc>()
+        .add(AccountSelected(accountSelected: accountId));
+    context.read<TransactionBloc>().add(TransactionFormFieldChanged(
+        fieldName: 'account_id', fieldValue: accountId));
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -403,14 +407,19 @@ class AccountToBeTransferredSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-//Validator
-    if (transaction != null) {
-      context.read<AccountBloc>().add(AccountToBeTransferredSelected(
-          accountToBeTransferredSelected: transaction!.accountId));
-    } else {
-      context.read<AccountBloc>().add(
-          AccountToBeTransferredSelected(accountToBeTransferredSelected: 1));
+    int accountId = 1;
+
+    if (transaction?.type == "income") {
+      accountId = context.watch<TransactionTypeBloc>().state.selectedValue ==
+              Operations.transfer
+          ? transaction!.accountId
+          : 1;
     }
+
+    context.read<AccountBloc>().add(AccountToBeTransferredSelected(
+        accountToBeTransferredSelected: accountId));
+    context.read<TransactionBloc>().add(TransactionFormFieldChanged(
+        fieldName: 'account_id_destination', fieldValue: accountId));
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

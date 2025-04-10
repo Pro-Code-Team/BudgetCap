@@ -124,9 +124,12 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     // Emitir evento para crear o actualizar la transacción
     add(TransactionCreated(transaction));
 
+    //TODO: Verificar la edicion de un transaction a transfer
+
     // Do this if TRANSFER - Taking care of the second transaction
     if (formData['transaction_type'] == "transfer") {
       //Converting amount to positive
+      formData['id'] = null;
       formData['amount'] = formData['amount'] * -1;
       formData['account_id'] = formData['account_id_destination'];
 
