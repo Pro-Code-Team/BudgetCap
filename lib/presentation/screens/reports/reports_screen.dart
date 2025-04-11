@@ -78,7 +78,7 @@ class ReportsScreen extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 10),
                                         Text(
-                                          '${account.balance.round()} USD',
+                                          '${account.balance.round()} ${account.currency}',
                                           style: const TextStyle(fontSize: 16),
                                         ),
                                       ],

@@ -31,8 +31,8 @@ class TransactionScreen extends StatelessWidget {
               // Trigger form validation
               if (_formKey.currentState?.validate() ?? false) {
                 // If the form is valid, dispatch the FormSubmitted event
-                context.read<TransactionBloc>().add(
-                    TransactionFormSubmitted(transactionId: transaction?.id));
+                context.read<TransactionBloc>().add(TransactionFormSubmitted(
+                    transactionId: transaction?.id, context: context));
                 //Will retrieve the balances for all account from the database whenever a transaction is created, updated or deleted.
                 context.read<AccountBloc>().add(
                       const AccountInitial(),
@@ -406,7 +406,7 @@ class AccountToBeTransferredSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int accountId = 1;
+    int accountId = transaction!.transferToBeSubmitted ?? 1;
 
     if (transaction?.type == "income") {
       accountId = context.watch<TransactionTypeBloc>().state.selectedValue ==

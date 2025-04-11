@@ -8,8 +8,10 @@ class TransactionModel {
   final String type;
   final DateTime date;
   final String description;
+  final int? transferToBeSubmitted;
 
   TransactionModel({
+    this.transferToBeSubmitted,
     this.id,
     required this.accountId,
     required this.categoryId,
@@ -37,6 +39,7 @@ class TransactionModel {
           map['date'] != null ? DateTime.parse(map['date']) : DateTime.now();
       final String description =
           map['description'] ?? (throw Exception('description is required'));
+      final int? transferToBeSubmitted = map['transferToBeSubmitted'] as int?;
 
       // Crear y devolver la instancia
       return TransactionModel(
@@ -47,6 +50,7 @@ class TransactionModel {
         type: type.name,
         date: date,
         description: description,
+        transferToBeSubmitted: transferToBeSubmitted,
       );
     } catch (e) {
       throw Exception('Error parsing TransactionModel: $e');
@@ -61,6 +65,7 @@ class TransactionModel {
       'type': type,
       'date': date.toIso8601String(),
       'description': description,
+      'transferToBeSubmitted': transferToBeSubmitted,
     };
 
     if (id != null) {

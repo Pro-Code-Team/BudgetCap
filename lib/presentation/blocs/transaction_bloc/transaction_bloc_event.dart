@@ -10,8 +10,9 @@ class TransactionFetchAll extends TransactionBlocEvent {
 
 class TransactionCreated extends TransactionBlocEvent {
   final Transaction transaction;
+  final BuildContext context;
 
-  const TransactionCreated(this.transaction);
+  const TransactionCreated({required this.transaction, required this.context});
 }
 
 //FORM HANDLERS
@@ -28,8 +29,12 @@ class TransactionFormFieldChanged extends TransactionBlocEvent {
 
 class TransactionFormSubmitted extends TransactionBlocEvent {
   final int? transactionId;
+  final BuildContext context;
 
-  TransactionFormSubmitted({this.transactionId});
+  TransactionFormSubmitted({
+    this.transactionId,
+    required this.context,
+  });
 }
 
 class TransactionFetchedById extends TransactionBlocEvent {
