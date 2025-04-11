@@ -140,15 +140,17 @@ class TransactionTypeSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //Validating type.
-    if (transaction != null) {
-      context.read<TransactionTypeBloc>().add(TransactionTypeChanged(
-          selectedTransactionType:
-              OperationsExtension.fromName(transaction!.type)));
-    } else {
-      context.read<TransactionTypeBloc>().add(const TransactionTypeChanged(
-          selectedTransactionType: Operations.expense));
-    }
+    String transactionType = transaction?.type ??
+        OperationsExtension.fromName('expense')
+            .name; // Default to income if transaction is null
+
+    context.read<TransactionTypeBloc>().add(TransactionTypeChanged(
+        selectedTransactionType:
+            OperationsExtension.fromName(transactionType)));
+
+    context.read<TransactionBloc>().add(TransactionFormFieldChanged(
+        fieldName: 'transaction_type', fieldValue: transactionType));
+
     return Center(
       child: BlocBuilder<TransactionTypeBloc, TransactionTypeState>(
         builder: (context, state) {
@@ -191,16 +193,13 @@ class DatePickerSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //Validating date.
-    if (transaction != null) {
-      context
-          .read<DatePickerBloc>()
-          .add(DateChanged(selectedDate: transaction!.date));
-    } else {
-      context
-          .read<DatePickerBloc>()
-          .add(DateChanged(selectedDate: DateTime.now()));
-    }
+    DateTime date = transaction?.date ?? DateTime.now();
+
+    context.read<DatePickerBloc>().add(DateChanged(selectedDate: date));
+
+    context
+        .read<TransactionBloc>()
+        .add(TransactionFormFieldChanged(fieldName: 'date', fieldValue: date));
 
     return Center(
       child: BlocBuilder<DatePickerBloc, DatePickerState>(
@@ -474,20 +473,19 @@ class CategoriesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //Validator
-    if (transaction != null) {
-      final int index = context
-          .read<CategoryBloc>()
-          .state
-          .categories
-          .indexWhere((category) => category.id == transaction!.categoryId);
+    int categoryId = transaction?.categoryId ?? 1;
 
-      context
-          .read<CategoryBloc>()
-          .add(CategoryChanged(categorySelected: index));
-    } else {
-      context.read<CategoryBloc>().add(CategoryChanged(categorySelected: -1));
-    }
+    final int index = context
+        .read<CategoryBloc>()
+        .state
+        .categories
+        .indexWhere((category) => category.id == categoryId);
+
+    context.read<CategoryBloc>().add(CategoryChanged(categorySelected: index));
+
+    context.read<TransactionBloc>().add(TransactionFormFieldChanged(
+        fieldName: 'category_id', fieldValue: categoryId));
+
     return Expanded(
       child: SingleChildScrollView(
         child: BlocBuilder<CategoryBloc, CategoryState>(

@@ -114,7 +114,6 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     formData['id'] = event.transactionId;
 
     if (formData['transaction_type'] != "income") {
-      //Converting amount to negative
       formData['amount'] = double.parse(formData['amount']!) * -1;
     }
 
