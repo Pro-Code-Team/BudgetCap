@@ -99,32 +99,12 @@ class TransactionView extends StatelessWidget {
                 transaction: transaction,
               ),
               const SizedBox(height: 10),
-              BlocBuilder<TransactionTypeBloc, TransactionTypeState>(
-                builder: (context, state) {
-                  if (state.selectedValue == Operations.transfer) {
-                    return AccountToBeTransferredSelection(
-                      transaction: transaction,
-                    );
-                  }
-                  return const SizedBox(
-                    height: 0,
-                  );
-                },
-              ),
             ],
           ),
-          BlocBuilder<TransactionTypeBloc, TransactionTypeState>(
-            builder: (context, state) {
-              if (state.selectedValue != Operations.transfer) {
-                return CategoriesView(
-                  transaction: transaction,
-                );
-              }
-              return const SizedBox(
-                height: 0,
-              );
-            },
+          CategoriesView(
+            transaction: transaction,
           ),
+          const SizedBox(height: 10),
         ],
       ),
     );
@@ -164,10 +144,6 @@ class TransactionTypeSelection extends StatelessWidget {
                 value: Operations.expense,
                 label: Text("Expense"),
               ),
-              ButtonSegment(
-                value: Operations.transfer,
-                label: Text("Transfer"),
-              )
             ],
             selected: <Operations>{state.selectedValue as Operations},
             onSelectionChanged: (selected) {
@@ -341,13 +317,6 @@ class AccountSelection extends StatelessWidget {
   Widget build(BuildContext context) {
     int accountId = transaction?.accountId ?? 1;
 
-    if (transaction?.type == "income") {
-      accountId = context.watch<TransactionTypeBloc>().state.selectedValue ==
-              Operations.transfer
-          ? 1
-          : transaction!.accountId;
-    }
-
     context
         .read<AccountBloc>()
         .add(AccountSelected(accountSelected: accountId));
@@ -387,73 +356,6 @@ class AccountSelection extends StatelessWidget {
                   context.read<TransactionBloc>().add(
                       TransactionFormFieldChanged(
                           fieldName: 'account_id', fieldValue: newValue));
-                }
-              },
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class AccountToBeTransferredSelection extends StatelessWidget {
-  final Transaction? transaction;
-  const AccountToBeTransferredSelection({
-    super.key,
-    this.transaction,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    int accountId = transaction!.transferToBeSubmitted ?? 1;
-
-    if (transaction?.type == "income") {
-      accountId = context.watch<TransactionTypeBloc>().state.selectedValue ==
-              Operations.transfer
-          ? transaction!.accountId
-          : 1;
-    }
-
-    context.read<AccountBloc>().add(AccountToBeTransferredSelected(
-        accountToBeTransferredSelected: accountId));
-    context.read<TransactionBloc>().add(TransactionFormFieldChanged(
-        fieldName: 'account_id_destination', fieldValue: accountId));
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const SizedBox(
-            child: Row(
-          children: [
-            Icon(Icons.wallet),
-            SizedBox(
-              width: 10,
-            ),
-            Text('Destination Account'),
-          ],
-        )),
-        BlocBuilder<AccountBloc, AccountState>(
-          builder: (context, state) {
-            return DropdownButton<int>(
-              value: state.accountToBeTransferred,
-              items: state.accounts.map<DropdownMenuItem<int>>((Account value) {
-                return DropdownMenuItem<int>(
-                  value: value.id,
-                  child: Text(
-                    value.name,
-                  ),
-                );
-              }).toList(),
-              onChanged: (int? newValue) {
-                if (newValue != null) {
-                  context.read<AccountBloc>().add(
-                      AccountToBeTransferredSelected(
-                          accountToBeTransferredSelected: newValue));
-                  context.read<TransactionBloc>().add(
-                      TransactionFormFieldChanged(
-                          fieldName: 'account_id_destination',
-                          fieldValue: newValue));
                 }
               },
             );

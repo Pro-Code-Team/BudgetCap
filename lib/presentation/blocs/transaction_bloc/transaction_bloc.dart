@@ -117,9 +117,10 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
 
     emit(state.copyWith(isValid: true, message: ''));
     formData['id'] = event.transactionId;
+    formData['amount'] = double.parse(formData['amount']!);
 
-    if (formData['transaction_type'] != "income") {
-      formData['amount'] = double.parse(formData['amount']!) * -1;
+    if (formData['transaction_type'] == "expense") {
+      formData['amount'] = formData['amount'] * -1;
     }
 
     // Do this if INCOME or EXPENSE
@@ -127,22 +128,7 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
 
     // Emitir evento para crear o actualizar la transacción
     add(TransactionCreated(transaction: transaction, context: event.context));
-
-    // Do this if TRANSFER - Taking care of the second transaction
-    if (formData['transaction_type'] == "transfer") {
-      //Converting amount to positive
-      formData['id'] = null;
-      formData['amount'] = formData['amount'] * -1;
-      formData['account_id'] = formData['account_id_destination'];
-
-      // Crear objeto Transaction
-      final Transaction transaction = _createTransactionFromForm(formData);
-      // Emitir evento para crear o actualizar la transacción
-      add(TransactionCreated(transaction: transaction, context: event.context));
-    }
   }
-
-//TODO: Arreglar segunda creacion de transaction en donde el account id y el account id destination son iguales.
 
 //Separated function
   Transaction _createTransactionFromForm(Map<String, dynamic> formData) {
@@ -151,12 +137,9 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
       accountId: formData['account_id'],
       type: formData['transaction_type'],
       amount: formData['amount'],
-      categoryId: formData['category_id'] ?? 1,
-      date: formData['date'] ?? DateTime.now(),
-      description: formData['description'] ?? '',
-      transferToBeSubmitted: formData['transaction_type'] != "transfer"
-          ? null
-          : formData['account_id_destination'],
+      categoryId: formData['category_id'],
+      date: formData['date'],
+      description: formData['description'],
     );
   }
 
@@ -170,15 +153,9 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     try {
       await _repository.deleteTransaction(event.transactionId);
       final newTransactions = state.transactions;
-      final Map<String, dynamic> formData =
-          Map<String, dynamic>.from(state.formData);
 
       newTransactions
           .removeWhere((transaction) => transaction.id == event.transactionId);
-      if (formData['transaction_type'] == "transfer") {
-        newTransactions.removeWhere((transaction) =>
-            transaction.accountId == formData['account_id_destination']);
-      }
 
       emit(state.copyWith(transactions: newTransactions, isInProgress: false));
     } catch (e) {

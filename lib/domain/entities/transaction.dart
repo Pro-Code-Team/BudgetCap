@@ -6,10 +6,8 @@ class Transaction {
   final String type;
   final DateTime date;
   final String description;
-  final int? transferToBeSubmitted;
 
   Transaction({
-    this.transferToBeSubmitted,
     this.id,
     required this.accountId,
     required this.categoryId,
@@ -27,7 +25,6 @@ class Transaction {
     String? type,
     DateTime? date,
     String? description,
-    int? transferToBeSubmitted,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -37,8 +34,6 @@ class Transaction {
       type: type ?? this.type,
       date: date ?? this.date,
       description: description ?? this.description,
-      transferToBeSubmitted:
-          transferToBeSubmitted ?? this.transferToBeSubmitted,
     );
   }
 }

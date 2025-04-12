@@ -11,7 +11,6 @@ class TransactionMapper {
       type: entity.type,
       date: entity.date,
       description: entity.description,
-      transferToBeSubmitted: entity.transferToBeSubmitted,
     );
   }
 
@@ -24,7 +23,6 @@ class TransactionMapper {
       type: model.type,
       date: model.date,
       description: model.description,
-      transferToBeSubmitted: model.transferToBeSubmitted,
     );
   }
 }
