@@ -75,7 +75,7 @@ final appRouter = GoRouter(
                   GoRoute(
                     path: '/accounts',
                     builder: (context, state) {
-                      return NewAccountScreen();
+                      return AllAccountsScreen();
                     },
                   ),
                 ]),

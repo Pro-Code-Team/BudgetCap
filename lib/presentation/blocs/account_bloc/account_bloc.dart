@@ -91,6 +91,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
             accounts: await _accountRepo.getAllAccounts(),
           ),
         );
+        emit(state.copyWith(isSuccess: false));
       } else {
         // Emit failure state if the response is empty
         emit(state.copyWith(
