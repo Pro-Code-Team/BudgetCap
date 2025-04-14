@@ -2,6 +2,7 @@ import 'package:budgetcap/config/constants/constants.dart';
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class NewAccountScreen extends StatelessWidget {
   NewAccountScreen({super.key});
@@ -29,6 +30,7 @@ class NewAccountScreen extends StatelessWidget {
                   backgroundColor: Colors.green,
                 ),
               );
+              context.pop();
             } else if (state.message.isNotEmpty && !state.isInProgress) {
               // Show error message
               ScaffoldMessenger.of(context).showSnackBar(
@@ -182,12 +184,13 @@ class NewAccountScreen extends StatelessWidget {
                             child: Container(
                               decoration: BoxDecoration(
                                 color: selectedIcon == iconName
-                                    ? Colors.blue.withValues(blue: 0.5)
+                                    ? const Color.fromARGB(255, 173, 70, 228)
+                                        .withValues(blue: 0.5)
                                     : Colors.grey.withValues(blue: 0.2),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: selectedIcon == iconName
-                                      ? Colors.blue
+                                      ? const Color.fromARGB(255, 57, 9, 89)
                                       : Colors.grey,
                                   width: 2,
                                 ),
@@ -216,7 +219,7 @@ class NewAccountScreen extends StatelessWidget {
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
                             context.read<AccountBloc>().add(
-                                  FormSubmitted(formData: state.formData),
+                                  FormSubmitted(),
                                 );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(

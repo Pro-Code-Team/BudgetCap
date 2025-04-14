@@ -68,6 +68,22 @@ final appRouter = GoRouter(
         StatefulShellBranch(
           routes: <RouteBase>[
             GoRoute(
+                path: '/settings',
+                builder: (BuildContext context, GoRouterState state) =>
+                    const SettingsScreen(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: '/accounts',
+                    builder: (context, state) {
+                      return NewAccountScreen();
+                    },
+                  ),
+                ]),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
                 path: '/accounts',
                 builder: (BuildContext context, GoRouterState state) =>
                     const AllAccountsScreen(),

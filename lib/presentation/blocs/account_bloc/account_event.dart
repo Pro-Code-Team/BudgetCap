@@ -39,10 +39,4 @@ class FormFieldChanged extends AccountEvent {
   });
 }
 
-class FormSubmitted extends AccountEvent {
-  final Map<String, String> formData;
-
-  FormSubmitted({
-    required this.formData,
-  });
-}
+class FormSubmitted extends AccountEvent {}

@@ -72,10 +72,10 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       // Call the repository to add the account
       final String response = await _accountRepo.addAccount(
         Account(
-          name: formData['name']!,
+          name: formData['name']!.toUpperCase(),
           description: formData['description']!,
           currency: formData['currency']!,
-          balance: double.tryParse(formData['balance']!) ?? 0.0,
+          balance: 0.0,
           icon: formData['icon']!,
           color: formData['color']!,
         ),
