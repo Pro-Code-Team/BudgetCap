@@ -13,21 +13,15 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     on<AccountSelected>(_onAccountSelected);
     on<AccountInitial>(_onAccountInitial);
     on<RecordAccount>(_onRecordAccount);
-    on<FormFieldChanged>(_onFormFieldChanged);
-    on<FormSubmitted>(_onFormSubmitted);
-    on<AccountToBeTransferredSelected>(_onAccountToBeTransferredSelected);
+    on<AccountFormFieldChanged>(_onFormFieldChanged);
+    on<AccountFormSubmitted>(_onFormSubmitted);
+    on<AccountFormInitializedValues>(_onFormInitializedValues);
 
     add(const AccountInitial());
   }
 
   void _onAccountSelected(AccountSelected event, Emitter<AccountState> emit) {
     emit(state.copyWith(accountSelected: event.accountSelected));
-  }
-
-  void _onAccountToBeTransferredSelected(
-      AccountToBeTransferredSelected event, Emitter<AccountState> emit) {
-    emit(state.copyWith(
-        accountToBeTransferred: event.accountToBeTransferredSelected));
   }
 
   Future<void> _onRecordAccount(
@@ -41,36 +35,49 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     }
   }
 
+  void _onFormInitializedValues(
+      AccountFormInitializedValues event, Emitter<AccountState> emit) {
+    emit(state.copyWith(
+      formData: event.formData,
+      isInProgress: false,
+      isSuccess: false,
+      message: '',
+    ));
+  }
+
   Future<void> _onAccountInitial(
       AccountInitial event, Emitter<AccountState> emit) async {
+    emit(state.copyWith(isInProgress: true, isSuccess: false, message: ''));
     try {
       emit(
         state.copyWith(
           accounts: await _accountRepo.getAllAccounts(),
+          isInProgress: false,
         ),
       );
     } catch (e) {
-      throw Exception(e.toString());
+      emit(state.copyWith(isInProgress: false, message: e.toString()));
     }
   }
 
   //FORM EVENTS
-  void _onFormFieldChanged(FormFieldChanged event, Emitter<AccountState> emit) {
+  void _onFormFieldChanged(
+      AccountFormFieldChanged event, Emitter<AccountState> emit) {
     final newFormData = Map<String, String>.from(state.formData);
     newFormData[event.fieldName] = event.fieldValue;
     emit(state.copyWith(formData: newFormData));
   }
 
   Future<void> _onFormSubmitted(
-      FormSubmitted event, Emitter<AccountState> emit) async {
-    final formData = state.formData;
+      AccountFormSubmitted event, Emitter<AccountState> emit) async {
+    final Map<String, String> formData = state.formData;
 
     // Emit loading state
-    emit(state.copyWith(isInProgress: true, message: '', isSuccess: false));
+    emit(state.copyWith(isInProgress: true));
 
     try {
       // Call the repository to add the account
-      final String response = await _accountRepo.addAccount(
+      final int accountId = await _accountRepo.addAccount(
         Account(
           name: formData['name']!.toUpperCase(),
           description: formData['description']!,
@@ -82,16 +89,15 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       );
 
       // Emit success state if the response is valid
-      if (response.isNotEmpty) {
+      if (accountId > 0) {
         emit(
           state.copyWith(
             isInProgress: false,
             isSuccess: true,
             message: 'The account has been created successfully!',
-            accounts: await _accountRepo.getAllAccounts(),
           ),
         );
-        emit(state.copyWith(isSuccess: false));
+        add(const AccountInitial());
       } else {
         // Emit failure state if the response is empty
         emit(state.copyWith(

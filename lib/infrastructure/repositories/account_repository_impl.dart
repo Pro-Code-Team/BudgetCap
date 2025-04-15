@@ -14,7 +14,7 @@ class AccountRepositoryImpl extends AccountRepository {
   }
 
   @override
-  Future<String> addAccount(Account account) async {
+  Future<int> addAccount(Account account) async {
     return await _datasource.addAccount(account);
   }
 }

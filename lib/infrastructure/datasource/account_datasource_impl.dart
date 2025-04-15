@@ -28,14 +28,15 @@ class AccountDatasourceImpl extends AccountDatasource {
   }
 
   @override
-  Future<String> addAccount(Account account) async {
+  Future<int> addAccount(Account account) async {
     //
     try {
-      final accountSupabase = AccountMapper.toModel(account).toMap();
-      final data =
+      final Map<String, dynamic> accountSupabase =
+          AccountMapper.toModel(account).toMap();
+      final List<Map<String, dynamic>> data =
           await _supabase.from(_tableName).upsert(accountSupabase).select();
 
-      return data.first['id'].toString();
+      return data.first['id'] as int;
     } catch (e) {
       throw Exception(e);
     }

@@ -73,11 +73,27 @@ final appRouter = GoRouter(
                     const SettingsScreen(),
                 routes: <RouteBase>[
                   GoRoute(
-                    path: '/accounts',
-                    builder: (context, state) {
-                      return AllAccountsScreen();
-                    },
-                  ),
+                      path: '/accounts',
+                      builder: (context, state) {
+                        return AllAccountsScreen();
+                      },
+                      routes: <RouteBase>[
+                        GoRoute(
+                          path: '/create',
+                          builder: (context, state) {
+                            return AccountScreen();
+                          },
+                        ),
+                        GoRoute(
+                          path: '/edit',
+                          builder: (context, state) {
+                            final int accountId = state.extra as int;
+                            return AccountScreen(
+                              accountId: accountId,
+                            );
+                          },
+                        )
+                      ]),
                 ]),
           ],
         ),

@@ -1,28 +1,26 @@
 import 'package:budgetcap/config/constants/constants.dart';
+import 'package:budgetcap/domain/entities/account.dart';
 import 'package:budgetcap/presentation/blocs/account_bloc/account_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class NewAccountScreen extends StatelessWidget {
-  NewAccountScreen({super.key});
+class AccountScreen extends StatelessWidget {
+  final int? accountId;
+  AccountScreen({super.key, this.accountId});
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    String? selectedCurrency;
-    String? selectedColor;
-    String? selectedIcon;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create New Account'),
+        title: Text('${accountId == null ? 'Create New' : 'Edit'} Account'),
       ),
       body: SafeArea(
         child: BlocConsumer<AccountBloc, AccountState>(
           listener: (context, state) {
-            if (state.isSuccess) {
+            if (state.isSuccess && !state.isInProgress) {
               // Show success message and navigate back
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -42,12 +40,38 @@ class NewAccountScreen extends StatelessWidget {
             }
           },
           builder: (context, state) {
+            if (state.accounts.isEmpty) {
+              return const Center(
+                child: Text('No accounts available.'),
+              );
+            }
             if (state.isInProgress) {
               // Show CircularProgressIndicator while loading
               return const Center(
                 child: CircularProgressIndicator(),
               );
             }
+
+            final Account account =
+                state.accounts.firstWhere((account) => account.id == accountId);
+
+            String? selectedCurrency = account.currency;
+            String? selectedColor = account.color;
+            String? selectedIcon = account.icon;
+
+            if (accountId != null) {
+              final Map<String, String> initialValues = {
+                'name': account.name,
+                'currency': account.currency,
+                'description': account.description,
+                'color': account.color,
+                'icon': account.icon,
+              };
+              context.read<AccountBloc>().add(
+                    AccountFormInitializedValues(formData: initialValues),
+                  );
+            }
+            //
             List<String> iconsName = icons.keys.toList();
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -69,11 +93,12 @@ class NewAccountScreen extends StatelessWidget {
                         return null;
                       },
                       onChanged: (value) {
-                        context.read<AccountBloc>().add(FormFieldChanged(
+                        context.read<AccountBloc>().add(AccountFormFieldChanged(
                               fieldName: 'name',
                               fieldValue: value,
                             ));
                       },
+                      initialValue: accountId == null ? '' : account.name,
                     ),
                     const SizedBox(height: 20),
 
@@ -83,18 +108,18 @@ class NewAccountScreen extends StatelessWidget {
                         labelText: 'Currency',
                       ),
                       value: selectedCurrency,
-                      items: currencies.map((currency) {
+                      items: currencies.map((Map<String, String> currency) {
                         return DropdownMenuItem(
                           value: currency['currency'],
                           child: Text(
                               '${currency['country']} (${currency['currency']})'),
                         );
                       }).toList(),
-                      onChanged: (value) {
+                      onChanged: (String? value) {
                         selectedCurrency = value;
-                        context.read<AccountBloc>().add(FormFieldChanged(
+                        context.read<AccountBloc>().add(AccountFormFieldChanged(
                               fieldName: 'currency',
-                              fieldValue: value!,
+                              fieldValue: selectedCurrency!,
                             ));
                       },
                       validator: (value) {
@@ -118,8 +143,10 @@ class NewAccountScreen extends StatelessWidget {
                         }
                         return null;
                       },
+                      initialValue:
+                          accountId == null ? '' : account.description,
                       onChanged: (value) {
-                        context.read<AccountBloc>().add(FormFieldChanged(
+                        context.read<AccountBloc>().add(AccountFormFieldChanged(
                               fieldName: 'description',
                               fieldValue: value,
                             ));
@@ -133,17 +160,17 @@ class NewAccountScreen extends StatelessWidget {
                         labelText: 'Color',
                       ),
                       value: selectedColor,
-                      items: colors.map((color) {
+                      items: colors.map((Map<String, String> color) {
                         return DropdownMenuItem(
                           value: color['hex'],
                           child: Text(color['name']!),
                         );
                       }).toList(),
-                      onChanged: (value) {
+                      onChanged: (String? value) {
                         selectedColor = value;
-                        context.read<AccountBloc>().add(FormFieldChanged(
+                        context.read<AccountBloc>().add(AccountFormFieldChanged(
                               fieldName: 'color',
-                              fieldValue: value!,
+                              fieldValue: selectedColor!,
                             ));
                       },
                       validator: (value) {
@@ -176,7 +203,9 @@ class NewAccountScreen extends StatelessWidget {
                           return GestureDetector(
                             onTap: () {
                               selectedIcon = iconName;
-                              context.read<AccountBloc>().add(FormFieldChanged(
+                              context
+                                  .read<AccountBloc>()
+                                  .add(AccountFormFieldChanged(
                                     fieldName: 'icon',
                                     fieldValue: iconName,
                                   ));
@@ -219,7 +248,7 @@ class NewAccountScreen extends StatelessWidget {
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
                             context.read<AccountBloc>().add(
-                                  FormSubmitted(),
+                                  AccountFormSubmitted(),
                                 );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -231,7 +260,8 @@ class NewAccountScreen extends StatelessWidget {
                             );
                           }
                         },
-                        child: const Text('Create Account'),
+                        child: Text(
+                            '${accountId == null ? 'Create' : 'Save'} Account'),
                       ),
                     ),
                   ],

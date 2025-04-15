@@ -14,29 +14,28 @@ class AccountSelected extends AccountEvent {
   const AccountSelected({required this.accountSelected});
 }
 
-class AccountToBeTransferredSelected extends AccountEvent {
-  final int accountToBeTransferredSelected;
-
-  AccountToBeTransferredSelected(
-      {required this.accountToBeTransferredSelected});
-}
-
 class RecordAccount extends AccountEvent {
   final Account account;
 
   RecordAccount({required this.account});
 }
 
+class AccountFormInitializedValues extends AccountEvent {
+  final Map<String, String> formData;
+
+  const AccountFormInitializedValues({required this.formData});
+}
+
 //FORM HANDLERS
 
-class FormFieldChanged extends AccountEvent {
+class AccountFormFieldChanged extends AccountEvent {
   final String fieldName;
   final String fieldValue;
 
-  const FormFieldChanged({
+  const AccountFormFieldChanged({
     required this.fieldName,
     required this.fieldValue,
   });
 }
 
-class FormSubmitted extends AccountEvent {}
+class AccountFormSubmitted extends AccountEvent {}
