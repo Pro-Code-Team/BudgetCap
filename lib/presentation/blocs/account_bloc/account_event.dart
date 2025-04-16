@@ -39,3 +39,9 @@ class AccountFormFieldChanged extends AccountEvent {
 }
 
 class AccountFormSubmitted extends AccountEvent {}
+
+class AccountCategorySelected extends AccountEvent {
+  final String iconName;
+
+  AccountCategorySelected({required this.iconName});
+}

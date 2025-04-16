@@ -24,7 +24,7 @@ class AllAccountsScreen extends StatelessWidget {
                 final account = state.accounts[index];
                 return GestureDetector(
                   onTap: () {
-                    context.go('/settings/accounts/edit/', extra: account.id);
+                    context.go('/settings/accounts/edit', extra: account);
                   },
                   child: Card(
                     margin:

@@ -16,6 +16,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     on<AccountFormFieldChanged>(_onFormFieldChanged);
     on<AccountFormSubmitted>(_onFormSubmitted);
     on<AccountFormInitializedValues>(_onFormInitializedValues);
+    on<AccountCategorySelected>(_onCategorySelected);
 
     add(const AccountInitial());
   }
@@ -66,6 +67,11 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     final newFormData = Map<String, String>.from(state.formData);
     newFormData[event.fieldName] = event.fieldValue;
     emit(state.copyWith(formData: newFormData));
+  }
+
+  void _onCategorySelected(
+      AccountCategorySelected event, Emitter<AccountState> emit) {
+    emit(state.copyWith(selectedIcon: event.iconName));
   }
 
   Future<void> _onFormSubmitted(

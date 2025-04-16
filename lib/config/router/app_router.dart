@@ -1,3 +1,4 @@
+import 'package:budgetcap/domain/entities/account.dart';
 import 'package:budgetcap/domain/entities/transaction.dart';
 import 'package:budgetcap/presentation/screens/reports/reports_screen.dart';
 import 'package:budgetcap/presentation/screens/screens.dart';
@@ -74,22 +75,21 @@ final appRouter = GoRouter(
                 routes: <RouteBase>[
                   GoRoute(
                       path: '/accounts',
-                      builder: (context, state) {
-                        return AllAccountsScreen();
-                      },
+                      builder: (BuildContext context, GoRouterState state) =>
+                          const AllAccountsScreen(),
                       routes: <RouteBase>[
                         GoRoute(
                           path: '/create',
-                          builder: (context, state) {
-                            return AccountScreen();
-                          },
+                          builder:
+                              (BuildContext context, GoRouterState state) =>
+                                  const AccountScreen(),
                         ),
                         GoRoute(
                           path: '/edit',
-                          builder: (context, state) {
-                            final int accountId = state.extra as int;
+                          builder: (BuildContext context, GoRouterState state) {
+                            final Account account = state.extra as Account;
                             return AccountScreen(
-                              accountId: accountId,
+                              account: account,
                             );
                           },
                         )
