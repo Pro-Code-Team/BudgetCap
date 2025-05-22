@@ -24,8 +24,9 @@ Future main() async {
   await dotenv.load(fileName: ".env");
   //Setting up the supabase
   await Supabase.initialize(
-      url: 'https://rdslpdguvbjyxouecbsw.supabase.co',
-      anonKey: Variables.supabaseAnonKey);
+    url: 'https://rdslpdguvbjyxouecbsw.supabase.co',
+    anonKey: Variables.supabaseAnonKey,
+  );
 
   // Get a reference your Supabase client
   final SupabaseClient supabase = Supabase.instance.client;
@@ -34,41 +35,61 @@ Future main() async {
   final TransactionDatasourceImpl transactionDatasource =
       TransactionDatasourceImpl(supabase: supabase);
 
-  final CategoryDatasourceImpl categoryDatasource =
-      CategoryDatasourceImpl(supabase: supabase);
+  final CategoryDatasourceImpl categoryDatasource = CategoryDatasourceImpl(
+    supabase: supabase,
+  );
 
-  final AccountDatasourceImpl accountDatasource =
-      AccountDatasourceImpl(supabase: supabase);
+  final AccountDatasourceImpl accountDatasource = AccountDatasourceImpl(
+    supabase: supabase,
+  );
 
   // Create a new instance of the repository
   final TransactionRepositoryImpl transactionRepository =
       TransactionRepositoryImpl(transactionDatasource: transactionDatasource);
 
-  final CategoryRepositoryImpl categoryRepository =
-      CategoryRepositoryImpl(categoryDatasource: categoryDatasource);
+  final CategoryRepositoryImpl categoryRepository = CategoryRepositoryImpl(
+    categoryDatasource: categoryDatasource,
+  );
 
-  final AccountRepositoryImpl accountRepository =
-      AccountRepositoryImpl(datasource: accountDatasource);
+  final AccountRepositoryImpl accountRepository = AccountRepositoryImpl(
+    datasource: accountDatasource,
+  );
 
   // Run the app
-  runApp(MultiBlocProvider(providers: [
-    BlocProvider<TransactionTypeBloc>(
-      create: (_) => TransactionTypeBloc(),
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<TransactionTypeBloc>(create: (_) => TransactionTypeBloc()),
+        BlocProvider<DatePickerBloc>(create: (_) => DatePickerBloc()),
+        BlocProvider<AccountBloc>(
+          create: (_) => AccountBloc(accountRepository),
+        ),
+        BlocProvider<CategoryBloc>(
+          create: (context) => CategoryBloc(categoryRepository),
+        ),
+        BlocProvider<TransactionBloc>(
+          create: (_) => TransactionBloc(transactionRepository),
+        ),
+        BlocProvider<ReportsBloc>(create: (_) => ReportsBloc()),
+      ],
+      child: const MyApp(),
     ),
-    BlocProvider<DatePickerBloc>(
-      create: (_) => DatePickerBloc(),
-    ),
-    BlocProvider<AccountBloc>(
-      create: (_) => AccountBloc(accountRepository),
-    ),
-    BlocProvider<CategoryBloc>(
-      create: (context) => CategoryBloc(categoryRepository),
-    ),
-    BlocProvider<TransactionBloc>(
-      create: (_) => TransactionBloc(transactionRepository),
-    ),
-    BlocProvider<ReportsBloc>(create: (_) => ReportsBloc()),
-  ], child: const MyApp()));
+  );
+}
+
+class AppInitializer extends StatelessWidget {
+  final Widget child;
+  const AppInitializer({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TransactionBloc, TransactionBlocState>(
+      builder: (context, state) {
+        context.read<TransactionBloc>().add(TransactionFetchAll());
+        return child;
+      },
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -77,13 +98,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: appRouter,
-      debugShowCheckedModeBanner: false,
-      title: 'BugdetCap',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return AppInitializer(
+      child: MaterialApp.router(
+        routerConfig: appRouter,
+        debugShowCheckedModeBanner: false,
+        title: 'BugdetCap',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
       ),
     );
   }

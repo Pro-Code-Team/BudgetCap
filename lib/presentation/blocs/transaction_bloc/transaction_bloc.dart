@@ -22,10 +22,14 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     on<TransactionFormSubmitted>(_onTransactionFormSubmitted);
     on<TransactionFetchedById>(_onTransactionFetchedById);
     on<TransactionDelete>(_onTransactionDelete);
+
+    add(TransactionFetchAll());
   }
 
   Future<void> _onTransactionCreated(
-      TransactionCreated event, Emitter<TransactionBlocState> emit) async {
+    TransactionCreated event,
+    Emitter<TransactionBlocState> emit,
+  ) async {
     emit(state.copyWith(isInProgress: true));
     final bool isEditMode = event.transaction.id != null;
     Transaction transaction = event.transaction;
@@ -44,23 +48,27 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
         isEditMode,
       );
 
-      emit(state.copyWith(
-        transactions: updatedTransactions,
-        isInProgress: false,
-      ));
+      emit(
+        state.copyWith(transactions: updatedTransactions, isInProgress: false),
+      );
       if (event.context.mounted) {
         event.context.read<AccountBloc>().add(const AccountInitial());
       }
     } catch (e) {
-      emit(state.copyWith(
-        isInProgress: false,
-        message: 'An unexpected error occurred: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          isInProgress: false,
+          message: 'An unexpected error occurred: ${e.toString()}',
+        ),
+      );
     }
   }
 
-  List<Transaction> _updateTransactionList(List<Transaction> transactions,
-      Transaction transaction, bool isEditMode) {
+  List<Transaction> _updateTransactionList(
+    List<Transaction> transactions,
+    Transaction transaction,
+    bool isEditMode,
+  ) {
     final updatedList = List<Transaction>.from(transactions);
     if (isEditMode) {
       final index = updatedList.indexWhere((t) => t.id == transaction.id);
@@ -74,34 +82,45 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
   }
 
   Future<void> _onTransactionFetchAll(
-      TransactionFetchAll event, Emitter<TransactionBlocState> emit) async {
+    TransactionFetchAll event,
+    Emitter<TransactionBlocState> emit,
+  ) async {
     emit(state.copyWith(isInProgress: true));
     try {
       emit(
-          state.copyWith(transactions: await _repository.getAllTransactions()));
+        state.copyWith(transactions: await _repository.getAllTransactions()),
+      );
       emit(state.copyWith(isInProgress: false));
     } catch (e) {
-      emit(state.copyWith(
-        isInProgress: false,
-        message: 'An unexpected error occurred: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          isInProgress: false,
+          message: 'An unexpected error occurred: ${e.toString()}',
+        ),
+      );
     }
   }
 
-//FORM EVENTS
+  //FORM EVENTS
   void _onTransactionFormFieldChanged(
-      TransactionFormFieldChanged event, Emitter<TransactionBlocState> emit) {
-    final Map<String, dynamic> newFormData =
-        Map<String, dynamic>.from(state.formData);
+    TransactionFormFieldChanged event,
+    Emitter<TransactionBlocState> emit,
+  ) {
+    final Map<String, dynamic> newFormData = Map<String, dynamic>.from(
+      state.formData,
+    );
     newFormData[event.fieldName] = event.fieldValue;
     emit(state.copyWith(formData: newFormData));
   }
 
-  Future<void> _onTransactionFormSubmitted(TransactionFormSubmitted event,
-      Emitter<TransactionBlocState> emit) async {
+  Future<void> _onTransactionFormSubmitted(
+    TransactionFormSubmitted event,
+    Emitter<TransactionBlocState> emit,
+  ) async {
     //Copy of form data to add a new field to the formData
-    final Map<String, dynamic> formData =
-        Map<String, dynamic>.from(state.formData);
+    final Map<String, dynamic> formData = Map<String, dynamic>.from(
+      state.formData,
+    );
 
     // Validar campos requeridos
     if (formData['amount'] == null || formData['amount']!.isEmpty) {
@@ -110,8 +129,12 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     }
 
     if (double.tryParse(formData['amount']!) == null) {
-      emit(state.copyWith(
-          isValid: false, message: 'Amount must be a valid number'));
+      emit(
+        state.copyWith(
+          isValid: false,
+          message: 'Amount must be a valid number',
+        ),
+      );
       return;
     }
 
@@ -130,7 +153,7 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
     add(TransactionCreated(transaction: transaction, context: event.context));
   }
 
-//Separated function
+  //Separated function
   Transaction _createTransactionFromForm(Map<String, dynamic> formData) {
     return Transaction(
       id: formData['id'],
@@ -144,25 +167,32 @@ class TransactionBloc extends Bloc<TransactionBlocEvent, TransactionBlocState> {
   }
 
   Future<void> _onTransactionFetchedById(
-      TransactionFetchedById event, Emitter<TransactionBlocState> emit) async {}
+    TransactionFetchedById event,
+    Emitter<TransactionBlocState> emit,
+  ) async {}
 
   Future<void> _onTransactionDelete(
-      TransactionDelete event, Emitter<TransactionBlocState> emit) async {
+    TransactionDelete event,
+    Emitter<TransactionBlocState> emit,
+  ) async {
     emit(state.copyWith(isInProgress: true));
 
     try {
       await _repository.deleteTransaction(event.transactionId);
       final newTransactions = state.transactions;
 
-      newTransactions
-          .removeWhere((transaction) => transaction.id == event.transactionId);
+      newTransactions.removeWhere(
+        (transaction) => transaction.id == event.transactionId,
+      );
 
       emit(state.copyWith(transactions: newTransactions, isInProgress: false));
     } catch (e) {
-      emit(state.copyWith(
-        isInProgress: false,
-        message: 'An unexpected error occurred: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          isInProgress: false,
+          message: 'An unexpected error occurred: ${e.toString()}',
+        ),
+      );
     }
   }
 }
