@@ -36,3 +36,4 @@
 **/*.log
 pubspec.lock
 .env
+.DS_Store
