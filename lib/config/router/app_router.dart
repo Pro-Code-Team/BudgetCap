@@ -2,6 +2,7 @@ import 'package:budgetcap/domain/entities/account.dart';
 import 'package:budgetcap/domain/entities/transaction.dart';
 
 import 'package:budgetcap/presentation/screens/screens.dart';
+import 'package:budgetcap/presentation/screens/transaction/transaction_screen_v2.dart';
 import 'package:budgetcap/presentation/views/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -30,7 +31,7 @@ final appRouter = GoRouter(
               // bottom navigation bar.
               path: '/',
               builder: (BuildContext context, GoRouterState state) =>
-                  HomeView(),
+                  TransactionScreenV2(),
               // routes: <RouteBase>[
               //   // The details screen to display stacked on navigator of the
               //   // first tab. This will cover screen A but not the application
